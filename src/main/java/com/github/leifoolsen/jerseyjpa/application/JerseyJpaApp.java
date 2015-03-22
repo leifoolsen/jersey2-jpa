@@ -10,7 +10,7 @@ import javax.ws.rs.ApplicationPath;
 
 // The REST-application
 @WebServlet(loadOnStartup = 1)
-@ApplicationPath("/test-api/*")
+@ApplicationPath("/api/*")
 public class JerseyJpaApp extends ResourceConfig {
     public static final String APPLICATION_PATH = "api";
 

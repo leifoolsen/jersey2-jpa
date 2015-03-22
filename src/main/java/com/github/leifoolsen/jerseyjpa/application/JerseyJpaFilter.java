@@ -11,7 +11,7 @@ import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 @WebFilter(
-        urlPatterns = "/*",
+        urlPatterns = "/api/*",
         filterName = "JPA-Filter",
         description = "JPA Session in View Filter"
 )

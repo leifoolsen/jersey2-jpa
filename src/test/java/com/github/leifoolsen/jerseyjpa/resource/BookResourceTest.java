@@ -1,5 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.resource;
 
+import com.github.leifoolsen.jerseyjpa.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
@@ -47,7 +48,7 @@ public class BookResourceTest {
 
         // Create the client
         Client c = ClientBuilder.newClient();
-        target = c.target(server.getURI()).path("test-api");
+        target = c.target(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH);
     }
 
     @AfterClass
