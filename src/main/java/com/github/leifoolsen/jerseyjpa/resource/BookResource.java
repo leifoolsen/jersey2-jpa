@@ -1,5 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.resource;
 
+import com.github.leifoolsen.jerseyjpa.application.Compress;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.repository.BookRepositoryJpa;
@@ -73,7 +74,7 @@ public class BookResource {
         // return Response.Status.BAD_REQUEST if Bean validation fails
     }
 
-
+    @Compress
     @GET
     public Response allBooks(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();

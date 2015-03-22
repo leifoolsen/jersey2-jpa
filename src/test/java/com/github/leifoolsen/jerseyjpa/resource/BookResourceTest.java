@@ -1,5 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.resource;
 
+import com.github.leifoolsen.jerseyjpa.application.GZIPReaderInterceptor;
 import com.github.leifoolsen.jerseyjpa.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
@@ -48,6 +49,9 @@ public class BookResourceTest {
 
         // Create the client
         Client c = ClientBuilder.newClient();
+
+        c.register(GZIPReaderInterceptor.class);
+
         target = c.target(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH);
     }
 
@@ -145,6 +149,7 @@ public class BookResourceTest {
                 .path(BookResource.RESOURCE_PATH)
                 .path("ping")
                 .request(MediaType.TEXT_PLAIN)
+                .accept(MediaType.TEXT_PLAIN_TYPE)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
