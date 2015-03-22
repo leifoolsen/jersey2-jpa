@@ -3,7 +3,7 @@ package com.github.leifoolsen.jerseyjpa.repository;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.util.Repository;
-import com.github.leifoolsen.jerseyjpa.util.RepositoryJpa;
+import com.github.leifoolsen.jerseyjpa.util.RepositoryJPA;
 import com.github.leifoolsen.jerseyjpa.util.QueryParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class BookRepositoryJpa {
     private final Repository repository;
 
     public BookRepositoryJpa(final Provider<EntityManager> provider) {
-        this.repository = new RepositoryJpa(provider);
+        this.repository = new RepositoryJPA(provider);
     }
 
     public Book newBook(final Book book) {
@@ -54,31 +54,31 @@ public class BookRepositoryJpa {
     public Book findBookByISBN(final String isbn) {
         final String jpql = "select b from %s b where b.isbn = :isbn";
         final QueryParameter qp = QueryParameter.with("isbn", isbn);
-        return RepositoryJpa.findFirstWithQuery(createQuery(jpql, Book.class, qp.parameters()));
+        return RepositoryJPA.findFirstWithQuery(createQuery(jpql, Book.class, qp.parameters()));
     }
 
     public List<Book> findBooksByPublisher(final Publisher publisher) {
         final String jpql = "select b from %s b where b.publisher = :publisher";
         final QueryParameter qp = QueryParameter.with("publisher", publisher);
-        return RepositoryJpa.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
+        return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
     }
 
     public List<Book> findBooksByAuthor(final String author) {
         final String jpql = "select b from %s b where b.author like :author";
         final QueryParameter qp = QueryParameter.with("author", author+"%");
-        return RepositoryJpa.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
+        return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
     }
 
     public Publisher findPublisherByCode(final String publisherCode) {
         final String jpql = "select p from %s p where p.code = :code";
         final QueryParameter qp = QueryParameter.with("code", publisherCode);
-        return RepositoryJpa.findFirstWithQuery(createQuery(jpql, Publisher.class, qp.parameters()));
+        return RepositoryJPA.findFirstWithQuery(createQuery(jpql, Publisher.class, qp.parameters()));
     }
 
     public List<Publisher> findPublishersByName(final String publisherName) {
         final String jpql = "select p from %s p where p.name like :name";
         final QueryParameter qp = QueryParameter.with("name", publisherName+"%");
-        return RepositoryJpa.findWithQuery(createQuery(jpql, Publisher.class, qp.parameters()), null, null);
+        return RepositoryJPA.findWithQuery(createQuery(jpql, Publisher.class, qp.parameters()), null, null);
     }
 
     public List<Publisher> findPublishers (final Integer offset, final Integer limit) {
@@ -86,7 +86,7 @@ public class BookRepositoryJpa {
     }
 
     private <T> TypedQuery<T> createQuery(final String queryString, final Class<T> entityClass, final Map<String, Object> parameters) {
-        final String entityName = RepositoryJpa.entityName(entityClass);
+        final String entityName = RepositoryJPA.entityName(entityClass);
         final String jpql = String.format(queryString, entityName);
         return repository.createQuery(jpql, entityClass, parameters);
     }

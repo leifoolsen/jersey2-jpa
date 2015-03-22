@@ -15,7 +15,7 @@ public class DatabasePopulator {
 
     public static void pupulateDb(JpaDatabaseConnectionManager.JpaDatabaseConnection connection) {
 
-        Repository repository = new RepositoryJpa(connection);
+        Repository repository = new RepositoryJPA(connection);
 
         // Persist some publishers
         final Map<String, Publisher> publishers = DomainPopulator.getPublishers();

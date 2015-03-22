@@ -27,13 +27,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class RepositoryJpa implements Repository {
-    private static final Logger logger = LoggerFactory.getLogger(RepositoryJpa.class);
+public class RepositoryJPA implements Repository {
+    private static final Logger logger = LoggerFactory.getLogger(RepositoryJPA.class);
 
     private final Provider<EntityManager> provider;
 
-    @Inject
-    public RepositoryJpa(final Provider<EntityManager> provider) {
+    @Inject  //
+    public RepositoryJPA(final Provider<EntityManager> provider) {
         this.provider = provider;
     }
 
@@ -444,7 +444,7 @@ public class RepositoryJpa implements Repository {
     }
 
 
-    private static final ConcurrentMap<String, Member> entityIdCache = new ConcurrentHashMap<String, Member>();
+    private static final ConcurrentMap<String, Member> entityIdCache = new ConcurrentHashMap<>();
 
     public static <T> Member getMemberAnnotadedWithId(final Class<T> entityClass) {
         Member member = entityIdCache.get(entityClass.getName());
@@ -469,7 +469,7 @@ public class RepositoryJpa implements Repository {
     public static <T> List<Member> findMembersAnnotatedWith(
             final Class<T> target, final Class<? extends Annotation>... annotations ) {
 
-        final List<Member> members = new ArrayList<Member>();
+        final List<Member> members = new ArrayList<>();
         for (Class<?> clazz = target; clazz != Object.class; clazz = clazz.getSuperclass()) {
             Member[] m = ObjectArrays.concat(clazz.getDeclaredFields(), clazz.getDeclaredMethods(), Member.class);
             for (final Member member : m) {
