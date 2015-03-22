@@ -1,6 +1,5 @@
-package com.github.leifoolsen.jerseyjpa.application;
+package com.github.leifoolsen.jerseyjpa.rest.application;
 
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

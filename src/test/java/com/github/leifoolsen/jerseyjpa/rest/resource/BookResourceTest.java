@@ -1,7 +1,7 @@
-package com.github.leifoolsen.jerseyjpa.resource;
+package com.github.leifoolsen.jerseyjpa.rest.resource;
 
-import com.github.leifoolsen.jerseyjpa.application.GZIPReaderInterceptor;
-import com.github.leifoolsen.jerseyjpa.application.JerseyJpaApp;
+import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
+import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
@@ -50,6 +50,7 @@ public class BookResourceTest {
         // Create the client
         Client c = ClientBuilder.newClient();
 
+        // Client interceptor to deflate GZIP'ed content
         c.register(GZIPReaderInterceptor.class);
 
         target = c.target(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH);

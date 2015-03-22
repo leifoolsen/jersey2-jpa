@@ -1,4 +1,4 @@
-package com.github.leifoolsen.jerseyjpa.application;
+package com.github.leifoolsen.jerseyjpa.rest.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
