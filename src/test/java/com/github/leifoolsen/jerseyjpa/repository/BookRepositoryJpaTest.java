@@ -32,7 +32,7 @@ public class BookRepositoryJpaTest {
 
     private static final String PU_NAME = "jpa-example-hibernate";
     private static JpaDatabaseConnectionManager.JpaDatabaseConnection connection = JpaDatabaseConnectionManager.createConnection(PU_NAME);
-    private static BookRepositoryJpa bookRepositoryJpa;
+    private static BookRepositoryJpa bookRepository;
 
     private static final String ISBN_VREDENS_DRUER = "9788253019727";
     private static final String ISBN_GUIDE_TO_MIDDLE_EARTH = "9780752495620";
@@ -70,7 +70,7 @@ public class BookRepositoryJpaTest {
         connection.properties(properties).start();
 
         // Create repositoty
-        bookRepositoryJpa = new BookRepositoryJpa(connection);
+        bookRepository = new BookRepositoryJpa(connection);
 
         // Pupulate DB
         DatabasePopulator.pupulateDb(connection);
@@ -93,7 +93,7 @@ public class BookRepositoryJpaTest {
 
     @Test
     public void newBook() {
-        Publisher publisher = bookRepositoryJpa.findPublisherByCode(DomainPopulator.CAPPELEN_DAMM);
+        Publisher publisher = bookRepository.findPublisherByCode(DomainPopulator.CAPPELEN_DAMM);
         assertNotNull(publisher);
 
         Book book = Book
@@ -109,90 +109,90 @@ public class BookRepositoryJpaTest {
                     "Så blir han pastor og går bananas.")
             .build();
 
-        bookRepositoryJpa.newBook(book);
+        bookRepository.newBook(book);
         logger.debug("Book with Id: {} and ISBN: '{}' persisted", book.getId(), book.formattedISBN());
 
-        Book persistedBook = bookRepositoryJpa.findBook(book.getId());
+        Book persistedBook = bookRepository.findBook(book.getId());
         assertEquals(book.getId(), persistedBook.getId());
         assertEquals(publisher, book.getPublisher());
     }
 
     @Test
     public void updateBook() {
-        final Book vredensDuer = bookRepositoryJpa.findBookByISBN(ISBN_VREDENS_DRUER);
+        final Book vredensDuer = bookRepository.findBookByISBN(ISBN_VREDENS_DRUER);
         assertNotNull(vredensDuer);
         assertNotNull(vredensDuer.getPublisher());
 
         final String wrongTitle = vredensDuer.getTitle();
 
         Book vredensDruer = Book.with(vredensDuer, true).title("Vredens druer").build();
-        vredensDruer = bookRepositoryJpa.updateBook(vredensDruer);
+        vredensDruer = bookRepository.updateBook(vredensDruer);
 
         // Book is managed! Both instances, 'vredensDuer' and 'vredensDruer',  vill update
         assertEquals(vredensDruer.getTitle(), vredensDuer.getTitle());
 
         logger.debug("Updated book title from: '{}' to: '{}'", wrongTitle, vredensDruer.getTitle());
 
-        Book theBookWithTheCorrectedTitle=  bookRepositoryJpa.findBookByISBN(ISBN_VREDENS_DRUER);
+        Book theBookWithTheCorrectedTitle=  bookRepository.findBookByISBN(ISBN_VREDENS_DRUER);
         assertNotEquals(wrongTitle, theBookWithTheCorrectedTitle.getTitle());
     }
 
     @Test
     public void deleteBook() {
-        Book gtm = bookRepositoryJpa.findBookByISBN(ISBN_GUIDE_TO_MIDDLE_EARTH);
+        Book gtm = bookRepository.findBookByISBN(ISBN_GUIDE_TO_MIDDLE_EARTH);
         assertNotNull(gtm);
         String id = gtm.getId();
 
-        bookRepositoryJpa.deleteBook(gtm);
+        bookRepository.deleteBook(gtm);
         logger.debug("Book with Id: {} and ISBN: '{}' deleted", id, gtm.formattedISBN());
-        assertNull(bookRepositoryJpa.findBook(id));
+        assertNull(bookRepository.findBook(id));
     }
 
     @Test
     public void deleteNonExistingBookShouldNotFail() {
         String id = "a-non-existing-id";
-        bookRepositoryJpa.deleteBook(id);
+        bookRepository.deleteBook(id);
     }
 
     @Test
     public void shouldFindMoreThanTwoBooksByAuthorErlendLoe() {
         final String author = "Loe, Erlend";
-        List<Book> books = bookRepositoryJpa.findBooksByAuthor(author);
+        List<Book> books = bookRepository.findBooksByAuthor(author);
         logger.debug("Found {} books by author '{}'", books.size(), author);
         assertThat(books, hasSize(greaterThan(2)));
     }
 
     @Test
     public void shouldFindMoreThanOneBookByPublisherPicador() {
-        final Publisher publisher = bookRepositoryJpa.findPublisherByCode(DomainPopulator.PICADOR);
+        final Publisher publisher = bookRepository.findPublisherByCode(DomainPopulator.PICADOR);
         assertNotNull(publisher);
-        final List<Book> books = bookRepositoryJpa.findBooksByPublisher(publisher);
+        final List<Book> books = bookRepository.findBooksByPublisher(publisher);
         logger.debug("Found {} books by publisher '{}'", books.size(), publisher.getName());
         assertThat(books, hasSize(greaterThan(1)));
     }
 
     @Test
     public void shouldFindFourBooks() {
-        final List<Book> books = bookRepositoryJpa.findBooks(2, 4);
+        final List<Book> books = bookRepository.findBooks(2, 4);
         assertThat(books, hasSize(4));
     }
 
     @Test
     public void shouldFindFivePublishers() {
-        final List<Publisher> publishers = bookRepositoryJpa.findPublishers(0, 5);
+        final List<Publisher> publishers = bookRepository.findPublishers(0, 5);
         assertThat(publishers, hasSize(5));
     }
 
     @Test
     public void shouldFindPublishersWithNameCappelen() {
-        final List<Publisher> publishers = bookRepositoryJpa.findPublishersByName("Cappelen");
+        final List<Publisher> publishers = bookRepository.findPublishersByName("Cappelen");
         assertThat(publishers, hasSize(greaterThan(1)));
     }
 
     @Test
     public void createNewBookAndUpdateExistingBook() {
 
-        final Publisher publisher = bookRepositoryJpa.findPublisherByCode(DomainPopulator.WEIDENFELD);
+        final Publisher publisher = bookRepository.findPublisherByCode(DomainPopulator.WEIDENFELD);
         assertNotNull(publisher);
 
         Book aNewBook = Book.with("9780297871934")
@@ -209,11 +209,11 @@ public class BookRepositoryJpaTest {
                     "we all face.")
             .build();
 
-        Book b = bookRepositoryJpa.createOrUpdateBook(aNewBook);
+        Book b = bookRepository.createOrUpdateBook(aNewBook);
         assertThat(b.getVersion(), equalTo(0L));
 
 
-        Book bookForUpdate = bookRepositoryJpa.findBookByISBN(ISBN_TRAVELING_TO_INFINITY);
+        Book bookForUpdate = bookRepository.findBookByISBN(ISBN_TRAVELING_TO_INFINITY);
         assertNotNull(bookForUpdate);
 
         Book changedBook = Book
@@ -221,7 +221,7 @@ public class BookRepositoryJpaTest {
                 .published(new GregorianCalendar(2014, 12, 15).getTime())
                 .build();
 
-        b = bookRepositoryJpa.createOrUpdateBook(changedBook);
+        b = bookRepository.createOrUpdateBook(changedBook);
         assertThat(b.getVersion(), greaterThan(0L));
     }
 }

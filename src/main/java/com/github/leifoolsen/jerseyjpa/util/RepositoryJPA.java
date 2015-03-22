@@ -27,20 +27,22 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class RepositoryJPA {
-    private static final Logger logger = LoggerFactory.getLogger(RepositoryJPA.class);
+public class RepositoryJpa implements Repository {
+    private static final Logger logger = LoggerFactory.getLogger(RepositoryJpa.class);
 
     private final Provider<EntityManager> provider;
 
     @Inject
-    public RepositoryJPA(final Provider<EntityManager> provider) {
+    public RepositoryJpa(final Provider<EntityManager> provider) {
         this.provider = provider;
     }
 
+    @Override
     public EntityManager getEntityManager() {
         return provider.get();
     }
 
+    @Override
     public <T> T persist(final T entity) {
         EntityManager em = getEntityManager();
         boolean transactionAlreadyStarted = em.isJoinedToTransaction();
@@ -63,6 +65,7 @@ public class RepositoryJPA {
         return entity;
     }
 
+    @Override
     public <T> Collection<T> persist(final Collection<T> entities) {
         final Collection<T> result = Lists.newArrayList();
         EntityManager em = getEntityManager();
@@ -89,6 +92,7 @@ public class RepositoryJPA {
         return result;
     }
 
+    @Override
     public <T> T merge(final T entity) {
         EntityManager em = getEntityManager();
         boolean transactionAlreadyStarted = em.isJoinedToTransaction();
@@ -114,6 +118,7 @@ public class RepositoryJPA {
         }
     }
 
+    @Override
     public <T> Collection<T> merge(final Collection<T> entities) {
         final Collection<T> result = Lists.newArrayList();
         EntityManager em = getEntityManager();
@@ -140,6 +145,7 @@ public class RepositoryJPA {
         return result;
     }
 
+    @Override
     public <T> T createOrUpdate(final T entity) {
         EntityManager em = getEntityManager();
         boolean transactionAlreadyStarted = em.isJoinedToTransaction();
@@ -178,6 +184,7 @@ public class RepositoryJPA {
         }
     }
 
+    @Override
     public <T> Collection<T> createOrUpdate(final Collection<T> entities) {
         final Collection<T> result = Lists.newArrayList();
         EntityManager em = getEntityManager();
@@ -212,6 +219,7 @@ public class RepositoryJPA {
         return result;
     }
 
+    @Override
     public <T> void remove(final T entity) {
         EntityManager em = getEntityManager();
         boolean transactionAlreadyStarted = em.isJoinedToTransaction();
@@ -236,6 +244,7 @@ public class RepositoryJPA {
         }
     }
 
+    @Override
     public <T> void remove(final Class<T> entityClass, final Object id) {
         EntityManager em = getEntityManager();
         final T entity = em.find(entityClass, id);
@@ -268,6 +277,7 @@ public class RepositoryJPA {
         }
     }
 
+    @Override
     public <T> void remove(final Collection<T> entities) {
         EntityManager em = getEntityManager();
         boolean transactionAlreadyStarted = em.isJoinedToTransaction();
@@ -294,6 +304,7 @@ public class RepositoryJPA {
     /**
      * Note: getReference returns a PROXY. Use getReference with care!!
      */
+    @Override
     public <T> T getReference(final Class<T> entityClass, final Object id) {
 
         T entity = getEntityManager().getReference(entityClass, id);
@@ -309,14 +320,17 @@ public class RepositoryJPA {
         return entity;
     }
 
+    @Override
     public <T> T find(final Class<T> entityClass, final Object id) {
         return getEntityManager().find(entityClass, id);
     }
 
+    @Override
     public <T> List<T> find(final Class<T> entityClass) {
         return find(entityClass, null, null);
     }
 
+    @Override
     public <T> List<T> find(final Class<T> entityClass, final Integer offset, final Integer limit) {
         final String entityName = entityName(entityClass);
         TypedQuery<T> query = getEntityManager()
@@ -329,6 +343,7 @@ public class RepositoryJPA {
      * WARNIG! Not an efficient count-query. Use this as a template to create your own count.
      *  e.g.; "select count(e.id) from MyEntity e"
      */
+    @Override
     public <T> long count(final Class<T> entityClass) {
         final String entityName = entityName(entityClass);
         final Long result = (Long) getEntityManager()
@@ -338,36 +353,47 @@ public class RepositoryJPA {
         return result.intValue();
     }
 
+    @Override
     public void clear() {
         getEntityManager().clear();
     }
 
-    public <T> TypedQuery<T> createQuery(final String jpql, final Class<T> resultClass, final Map<String, Object> parameters) {
+    @Override
+    public <T> TypedQuery<T> createQuery(
+            final String jpql, final Class<T> resultClass, final Map<String, Object> parameters)
+    {
         final TypedQuery<T> query = getEntityManager().createQuery(jpql, resultClass);
         addQueryParameters(query, parameters);
         return query;
     }
 
-    public <T> TypedQuery<T> createNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Object> parameters) {
+    @Override
+    public <T> TypedQuery<T> createNamedQuery(
+            final String queryName, final Class<T> resultClass, final Map<String, Object> parameters)
+    {
         final TypedQuery<T> query = getEntityManager().createNamedQuery(queryName, resultClass);
         addQueryParameters(query, parameters);
         return query;
     }
 
-    public <T> Query createNativeQuery(final String sql, final Class<T> resultClass, final Map<String, Object> parameters) {
+    @Override
+    public <T> Query createNativeQuery(
+            final String sql, final Class<T> resultClass, final Map<String, Object> parameters)
+    {
         final Query query = getEntityManager().createNativeQuery(sql, resultClass);
         addQueryParameters(query, parameters);
         return query;
     }
 
-    public Query createNativeQuery(final String sql, final String resultSetMapping, final Map<String, Object> parameters) {
+    @Override
+    public Query createNativeQuery(
+            final String sql, final String resultSetMapping, final Map<String, Object> parameters)
+    {
         final Query query = getEntityManager().createNativeQuery(sql, resultSetMapping);
         addQueryParameters(query, parameters);
         return query;
     }
 
-
-    // Helper methods
     public static <T> List<T> findWithQuery(final TypedQuery<T> query, final Integer offset, final Integer limit) {
         if(MoreObjects.firstNonNull(offset, 0) > 0) {
             query.setFirstResult(offset);
@@ -426,7 +452,7 @@ public class RepositoryJPA {
             List<Member> m = findMembersAnnotatedWith(entityClass, Id.class, EmbeddedId.class);
             if(m.size() > 1) {
                 throw new IllegalStateException("Multile @Id annotations are not supported by this repository. " +
-                            "Use @EmbeddedId to represent a composite primary key!");
+                        "Use @EmbeddedId to represent a composite primary key!");
             }
             else if(m.size() < 1) {
                 throw new IllegalStateException("Entity without @Id annotation is not supported by this repository.");

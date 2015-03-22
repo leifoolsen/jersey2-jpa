@@ -12,13 +12,15 @@ import javax.ws.rs.ApplicationPath;
 @WebServlet(loadOnStartup = 1)
 @ApplicationPath("/test-api/*")
 public class JerseyJpaApp extends ResourceConfig {
+    public static final String APPLICATION_PATH = "api";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public JerseyJpaApp() {
         packages("com.github.leifoolsen.jerseyjpa");
 
         // Enable LoggingFilter & output entity.
-        registerInstances(new LoggingFilter(java.util.logging.Logger.getLogger(JerseyJpaApp.class.getName()), true));
+        //registerInstances(new LoggingFilter(java.util.logging.Logger.getLogger(JerseyJpaApp.class.getName()), true));
         
         logger.debug("Application '{}' initialized", getClass().getName());
     }

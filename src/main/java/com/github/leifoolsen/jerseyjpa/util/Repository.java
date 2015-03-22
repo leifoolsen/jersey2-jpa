@@ -7,9 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by leif on 22/03/15.
- */
 public interface Repository {
     EntityManager getEntityManager();
 

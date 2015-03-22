@@ -2,7 +2,7 @@ package com.github.leifoolsen.jerseyjpa.resource;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
-import com.github.leifoolsen.jerseyjpa.repository.BookRepository;
+import com.github.leifoolsen.jerseyjpa.repository.BookRepositoryJpa;
 import com.github.leifoolsen.jerseyjpa.repository.DatabaseConnection;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class BookResource {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private JpaDatabaseConnectionManager.JpaDatabaseConnection connection = DatabaseConnection.getConnection();
-    private BookRepository repository = new BookRepository(connection);
+    private BookRepositoryJpa repository = new BookRepositoryJpa(connection);
 
     private UriInfo uriInfo; // actual uri info provided by parent resource (threadsafe)
 

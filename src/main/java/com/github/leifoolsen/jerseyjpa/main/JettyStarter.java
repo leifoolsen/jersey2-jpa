@@ -1,7 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.main;
 
-import com.github.leifoolsen.simplejaxrs2.application.ApplicationConfig;
-import com.github.leifoolsen.simplejaxrs2.embeddedjetty.JettyFactory;
+import com.github.leifoolsen.jerseyjpa.application.JerseyJpaApp;
+import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.google.common.base.MoreObjects;
 import com.google.common.primitives.Ints;
 import org.eclipse.jetty.server.Server;
@@ -19,7 +19,7 @@ public class JettyStarter {
         Server server = new JettyFactory().port(port).build();
         JettyFactory.start(server);
 
-        URI applicationURI = UriBuilder.fromUri(server.getURI()).path(ApplicationConfig.APPLICATION_PATH).build();
+        URI applicationURI = UriBuilder.fromUri(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH).build();
         System.out.println(String.format("\nServer started with WADL available at "
                 + "%s/application.wadl\nExample usage: %s/books\n\nHIT ENTER TO STOP SERVER ...",
                 applicationURI.toString(), applicationURI.toString()));

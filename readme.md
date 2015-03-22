@@ -1,6 +1,6 @@
-#Jersey-2, MOXy, Embedded Jetty
+#Jersey-2, MOXy, JPA-2, Embedded Jetty
 Maven project demonstrating how to run a JAX-RS 2 project in Embedded Jetty-9 with Servlet-3.1 annotation based configuration,
-using Jersey-2 with JSON binding via MOXy.
+using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence.
 
 ## Steps to run this project
 * Fork, Clone or Download ZIP

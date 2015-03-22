@@ -41,7 +41,6 @@ public class BookResourceTest {
 
         // Start the server
         server = new JettyFactory()
-                .extraClasspath("./target/test-classes/com/github/leifoolsen/jerseyjpa")
                 .build();
 
         JettyFactory.start(server);

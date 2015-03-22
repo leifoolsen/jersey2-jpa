@@ -13,22 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 
-/**
- * <p>
- * A generic facade that provides easy access to a JPA persistence unit using
- * static methods.
- * </p>
- * <p>
- * This static class is designed so that it can be used with any JPA
- * application.
- * </p>
- * <p>
- * See: http://stackoverflow.com/questions/15071238/entitymanager-threadlocal-pattern-with-jpa-in-jse
- * See: http://stackoverflow.com/questions/3711439/how-to-create-a-thread-safe-entitymanagerfactory
- * See: http://naildrivin5.com/blog/2008/05/14/using-threadlocal-and-servlet-filters-to-cleanly-access-jpa-an-entitymanager.html
- * </p>
- */
-
 public class JpaDatabaseConnectionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(JpaDatabaseConnectionManager.class);
@@ -82,6 +66,22 @@ public class JpaDatabaseConnectionManager {
         }
     }
 
+
+    /**
+     * <p>
+     * A generic facade that provides easy access to a JPA persistence unit using
+     * static methods.
+     * </p>
+     * <p>
+     * This static class is designed so that it can be used with any JPA
+     * application.
+     * </p>
+     * <p>
+     * See: http://stackoverflow.com/questions/15071238/entitymanager-threadlocal-pattern-with-jpa-in-jse
+     * See: http://stackoverflow.com/questions/3711439/how-to-create-a-thread-safe-entitymanagerfactory
+     * See: http://naildrivin5.com/blog/2008/05/14/using-threadlocal-and-servlet-filters-to-cleanly-access-jpa-an-entitymanager.html
+     * </p>
+     */
 
     public static class JpaDatabaseConnection implements UnitOfWork, Provider<EntityManager> {
         private volatile EntityManagerFactory entityManagerFactory;

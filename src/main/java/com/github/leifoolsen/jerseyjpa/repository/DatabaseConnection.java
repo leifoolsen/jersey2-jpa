@@ -26,6 +26,14 @@ public class DatabaseConnection {
         properties.put("hibernate.show_sql", "false");
         properties.put("hibernate.format_sql", "true");
 
+        properties.put("hibernate.connection.provider_class", "org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider");
+        properties.put("hibernate.c3p0.min_size", "1");
+        properties.put("hibernate.c3p0.max_size", "4");
+        properties.put("hibernate.c3p0.acquire_increment", "2");
+        properties.put("hibernate.c3p0.timeout", "500");
+        properties.put("hibernate.c3p0.max_statements", "50");
+        properties.put("hibernate.c3p0.idle_test_period", "1000");
+
         // Add entity classes, Hibernate
         properties.put(org.hibernate.jpa.AvailableSettings.LOADED_CLASSES, Arrays.asList(Publisher.class, Book.class));
         */
