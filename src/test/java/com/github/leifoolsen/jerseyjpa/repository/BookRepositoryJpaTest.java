@@ -27,8 +27,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-public class BookRepositoryJpaTest {
-    private static final Logger logger = LoggerFactory.getLogger(BookRepositoryJpaTest.class);
+public class BookRepositoryJPATest {
+    private static final Logger logger = LoggerFactory.getLogger(BookRepositoryJPATest.class);
 
     private static final String PU_NAME = "jpa-example-hibernate";
     private static JpaDatabaseConnectionManager.JpaDatabaseConnection connection = JpaDatabaseConnectionManager.createConnection(PU_NAME);
