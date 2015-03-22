@@ -27,8 +27,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-public class BookRepositoryJPATest {
-    private static final Logger logger = LoggerFactory.getLogger(BookRepositoryJPATest.class);
+public class BookRepositoryJpaTest {
+    private static final Logger logger = LoggerFactory.getLogger(BookRepositoryJpaTest.class);
 
     private static final String PU_NAME = "jpa-example-hibernate";
     private static JpaDatabaseConnectionManager.JpaDatabaseConnection connection = JpaDatabaseConnectionManager.createConnection(PU_NAME);
@@ -41,7 +41,7 @@ public class BookRepositoryJPATest {
 
     @BeforeClass
     public static void beforeClass() {
-        // Configure PU
+        // Configure PU //
         Properties properties = new Properties();
         properties.put("javax.persistence.jdbc.driver", "org.h2.Driver");
         properties.put("javax.persistence.jdbc.url", "jdbc:h2:mem:mymemdb");
