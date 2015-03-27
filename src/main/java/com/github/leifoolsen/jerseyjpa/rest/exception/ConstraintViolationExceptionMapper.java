@@ -14,7 +14,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(Priorities.USER)
+//@Priority(Priorities.USER)
 public class ConstraintViolationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,7 +29,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
 
         ErrorMessage errorMessage = ErrorMessage.with(exception).build();
 
-        logger.debug("{}: {}", errorMessage.getStatus(), errorMessage.getMessage());
+        logger.debug(errorMessage.toString());
 
         return Response.status(errorMessage.getStatus())
                 .entity(errorMessage)

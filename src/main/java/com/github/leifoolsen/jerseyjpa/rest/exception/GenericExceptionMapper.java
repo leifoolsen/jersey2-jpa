@@ -27,7 +27,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
     public Response toResponse(Throwable t) {
         ErrorMessage errorMessage = ErrorMessage.with(t).build();
 
-        logger.debug("{}: {}", errorMessage.getStatus(), errorMessage.getMessage());
+        logger.debug(errorMessage.toString());
 
         return Response.status(errorMessage.getStatus())
                 .entity(errorMessage)

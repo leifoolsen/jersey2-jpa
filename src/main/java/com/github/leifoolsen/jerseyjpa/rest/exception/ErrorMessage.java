@@ -1,5 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.rest.exception;
 
+import com.github.leifoolsen.jerseyjpa.util.JAXBHelper;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -7,12 +9,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +22,11 @@ public class ErrorMessage {
 
     private String id = UUID.randomUUID().toString();
     private int status;
+    private Integer code;
     private String message;
+    private String messageTemplate;
+
+    @XmlTransient
     private String stackTrace;
 
     private List<ConstraintViolationMessage> constraintViolationMessages;
@@ -31,7 +35,9 @@ public class ErrorMessage {
 
     private ErrorMessage(Builder builder) {
         status = builder.responseStatus;
+        code = builder.code;
         message = builder.message;
+        messageTemplate = builder.messageTemplate;
         stackTrace = builder.stackTrace;
         constraintViolationMessages = builder.constraintViolationMessages;
     }
@@ -48,8 +54,16 @@ public class ErrorMessage {
         return status;
     }
 
+    public Integer getCode() {
+        return code;
+    }
+
     public String getMessage() {
         return message;
+    }
+
+    public String getMessageTemplate() {
+        return messageTemplate;
     }
 
     public String getStackTrace() {
@@ -60,39 +74,31 @@ public class ErrorMessage {
         return constraintViolationMessages;
     }
 
+    public String toJSON() {
+        return JAXBHelper.marshall(this, false);
+    }
+
     @Override
     public String toString() {
 
-
         try {
-            JAXBContext jc = JAXBContext.newInstance(ErrorMessage.class);
-
-            Marshaller marshaller = jc.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.setProperty("eclipselink.media-type", "application/json");
-            marshaller.setProperty("eclipselink.json.include-root", false);
-            //marshaller.marshal(this, null);
-            // http://blog.bdoughan.com/2013/07/eclipselink-moxy-and-java-api-for-json.html
-            // http://blog.bdoughan.com/2011/08/json-binding-with-eclipselink-moxy.html
-            //
-
+            return JAXBHelper.marshall(this, true);
         }
-        catch (JAXBException e) {
-            return "ErrorMessage{" +
+        catch (Exception e) {
+            return "Marshalling failed with message: " + e.getMessage() +
+                    "Fallback {" +
                     "id='" + id + '\'' +
                     ", status=" + status +
                     ", message='" + message + '\'' +
                     '}';
         }
-
-
-        return null;
-
     }
 
     public static class Builder {
         private int responseStatus;
+        private Integer code;
         private String message;
+        private String messageTemplate;
         private String stackTrace;
         private List<ConstraintViolationMessage> constraintViolationMessages;
 
@@ -112,6 +118,10 @@ public class ErrorMessage {
 
             if(t instanceof ConstraintViolationException) {
                 ConstraintViolationException cve = (ConstraintViolationException)t;
+
+                if(MoreObjects.firstNonNull(message, "").trim().length() < 1) {
+                    message = "Bean Validation constraint(s) violated.";
+                }
 
                 constraintViolationMessages = Lists.newArrayList();
                 for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {

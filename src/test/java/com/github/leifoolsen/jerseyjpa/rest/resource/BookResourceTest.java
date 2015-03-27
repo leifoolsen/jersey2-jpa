@@ -99,7 +99,6 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
-        //logger.debug(errorMessage);
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), errorMessage.getStatus());
     }
 

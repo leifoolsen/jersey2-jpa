@@ -125,27 +125,11 @@ public class Book {
         Book book = (Book) o;
 
         return isbn == null ? (book.isbn == null) : isbn.equals(book.isbn);
-
     }
 
     @Override
     public int hashCode() {
         return isbn.hashCode();
-    }
-
-    public static void validate(final Book book) {
-        // TODO: Make a generic validation helper
-
-        if(book == null) {
-            throw new ConstraintViolationException("Book may not be null", new HashSet<ConstraintViolation<?>>());
-        }
-
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<Book>> constraintViolations = validator.validate(book);
-        if(!constraintViolations.isEmpty()) {
-            throw new ConstraintViolationException("Validation failed",
-                    new HashSet<ConstraintViolation<?>>(constraintViolations));
-        }
     }
 
     @Override
