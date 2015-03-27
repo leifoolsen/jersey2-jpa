@@ -1,36 +1,37 @@
 package com.github.leifoolsen.jerseyjpa.rest.exception;
 
+import javax.validation.Path;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PropertyErrorMessage {
+public class ConstraintViolationMessage {
 
     private String message;
     private String messageTemplate;
-    private String path;
+    private String propertyPath;
     private String invalidValue;
 
     /**
      * Create a {@code PropertyErrorMessage} instance. Constructor for JAXB providers.
      */
-    protected PropertyErrorMessage() {}
+    protected ConstraintViolationMessage() {}
 
     /**
      * Create a {@code PropertyErrorMessage} instance.
      *
      * @param message interpolated error message.
      * @param messageTemplate non-interpolated error message.
-     * @param path property path.
+     * @param propertyPath  propertyPath.
      * @param invalidValue value that failed to pass constraints.
      */
-    public PropertyErrorMessage(String message, String messageTemplate, String path, String invalidValue) {
+    public ConstraintViolationMessage(String message, String messageTemplate, Path propertyPath, Object invalidValue) {
         this.message = message;
         this.messageTemplate = messageTemplate;
-        this.path = path;
-        this.invalidValue = invalidValue;
+        this.propertyPath = propertyPath != null ? propertyPath.toString() : null;
+        this.invalidValue = invalidValue != null ? invalidValue.toString() : null;
     }
 
     public String getMessage() {
@@ -41,8 +42,8 @@ public class PropertyErrorMessage {
         return messageTemplate;
     }
 
-    public String getPath() {
-        return path;
+    public String getPropertyPath() {
+        return propertyPath;
     }
 
     public String getInvalidValue() {

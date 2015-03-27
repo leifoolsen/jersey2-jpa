@@ -124,9 +124,8 @@ public class Book {
 
         Book book = (Book) o;
 
-        if (!isbn.equals(book.isbn)) return false;
+        return isbn == null ? (book.isbn == null) : isbn.equals(book.isbn);
 
-        return true;
     }
 
     @Override
@@ -151,7 +150,7 @@ public class Book {
 
     @Override
     public String toString() {
-        return formattedISBN() + ", " + title;
+        return isbn + ", " + title;
     }
 
     public static Builder with(final String isbn) { return new Builder(isbn); }

@@ -1,8 +1,15 @@
 package com.github.leifoolsen.jerseyjpa.rest.exception;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -12,55 +19,25 @@ import java.util.UUID;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ErrorMessage {
+
     private String id = UUID.randomUUID().toString();
     private int status;
-    private Integer code;
     private String message;
-    private String link;
-    private String messageTemplate;
-    private String path;
-    private List<PropertyErrorMessage> propertyErrorMessages;
+    private String stackTrace;
 
-    /**
-     * Create a {@code ErrorMessage} instance. Constructor for JAXB providers.
-     */
+    private List<ConstraintViolationMessage> constraintViolationMessages;
+
     protected ErrorMessage() {}
 
-
-    /**
-     *
-     */
-    /**
-     * Create a {@code ErrorMessage} instance.
-     *
-     * @param status  HTTP Status code returned by the server. <br />
-     *                See {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">HTTP/1.1 documentation</a>}
-     *                for list of status codes. Additional status codes can be added by applications
-     *                by creating an implementation of {@link javax.ws.rs.core.Response.StatusType}.
-     * @param code application specific error code
-     * @param message interpolated error message.
-     * @param link point to page where the error is documented.
-     * @param messageTemplate non-interpolated error message.
-     * @param path instance path.
-     */
-    public ErrorMessage(int status, int code, String message, String link, String messageTemplate, String path, List<PropertyErrorMessage> propertyErrorMessages) {
-        this.status = status;
-        this.code = code;
-        this.message = message;
-        this.link = link;
-        this.messageTemplate = messageTemplate;
-        this.path = path;
-        this.propertyErrorMessages = propertyErrorMessages;
+    private ErrorMessage(Builder builder) {
+        status = builder.responseStatus;
+        message = builder.message;
+        stackTrace = builder.stackTrace;
+        constraintViolationMessages = builder.constraintViolationMessages;
     }
 
-
-    public void addPropertyErrorMessage(PropertyErrorMessage propertyErrorMessage) {
-        if(propertyErrorMessage != null) {
-            if (propertyErrorMessages == null) {
-                propertyErrorMessages = Lists.newArrayList();
-            }
-            propertyErrorMessages.add(propertyErrorMessage);
-        }
+    public static Builder with(Throwable t) {
+        return new Builder(t);
     }
 
     public String getId() {
@@ -71,23 +48,102 @@ public class ErrorMessage {
         return status;
     }
 
-    public Integer getCode() {
-        return code;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public String getLink() {
-        return link;
+    public String getStackTrace() {
+        return stackTrace;
     }
 
-    public String getMessageTemplate() {
-        return messageTemplate;
+    public List<ConstraintViolationMessage> getConstraintViolationMessages() {
+        return constraintViolationMessages;
     }
 
-    public String getPath() {
-        return path;
+    @Override
+    public String toString() {
+
+
+        try {
+            JAXBContext jc = JAXBContext.newInstance(ErrorMessage.class);
+
+            Marshaller marshaller = jc.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setProperty("eclipselink.media-type", "application/json");
+            marshaller.setProperty("eclipselink.json.include-root", false);
+            //marshaller.marshal(this, null);
+            // http://blog.bdoughan.com/2013/07/eclipselink-moxy-and-java-api-for-json.html
+            // http://blog.bdoughan.com/2011/08/json-binding-with-eclipselink-moxy.html
+            //
+
+        }
+        catch (JAXBException e) {
+            return "ErrorMessage{" +
+                    "id='" + id + '\'' +
+                    ", status=" + status +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
+
+
+        return null;
+
+    }
+
+    public static class Builder {
+        private int responseStatus;
+        private String message;
+        private String stackTrace;
+        private List<ConstraintViolationMessage> constraintViolationMessages;
+
+        private Builder(Throwable t) {
+            responseStatus = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+
+            if(t instanceof ConstraintViolationException) {
+                responseStatus = Response.Status.BAD_REQUEST.getStatusCode();
+            }
+            else if(t instanceof WebApplicationException) {
+                responseStatus = ((WebApplicationException) t).getResponse().getStatus();
+            }
+
+            message = t.getMessage();
+
+            stackTrace = Throwables.getStackTraceAsString(t);
+
+            if(t instanceof ConstraintViolationException) {
+                ConstraintViolationException cve = (ConstraintViolationException)t;
+
+                constraintViolationMessages = Lists.newArrayList();
+                for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
+                    constraintViolationMessages.add(
+                        new ConstraintViolationMessage(
+                            constraintViolation.getMessage(),
+                            constraintViolation.getMessageTemplate(),
+                            constraintViolation.getPropertyPath(),
+                            constraintViolation.getInvalidValue()));
+                }
+            }
+        }
+
+        public ErrorMessage build() {
+            return new ErrorMessage(this);
+        }
     }
 }
+
+
+
+
+/*
+ * Create a {@code ErrorMessage} instance.
+ *
+ * @param status  HTTP Status code returned by the server. <br />
+ *                See {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">HTTP/1.1 documentation</a>}
+ *                for list of status codes. Additional status codes can be added by applications
+ *                by creating an implementation of {@link javax.ws.rs.core.Response.StatusType}.
+ * @param code application specific error code
+ * @param message interpolated error message.
+ * @param link point to page where the error is documented.
+ * @param messageTemplate non-interpolated error message.
+ * @param path instance path.
+ */

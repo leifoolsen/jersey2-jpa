@@ -54,17 +54,10 @@ public class BookResource {
             @Pattern(regexp = "\\d+", message = "ISBN must be a valid number")
             @PathParam("isbn") final String isbn) {
 
-        final Book result;
-        try {
-            result = repository.findBookByISBN(isbn);
-        }
-        catch (Exception e) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
+        final Book result = repository.findBookByISBN(isbn);
 
         if (result == null) {
-            logger.debug(("Book with isbn: '{}' not found"), isbn);
-            throw new WebApplicationException(
+            throw new WebApplicationException("Book with isbn: '"+ isbn + "' not found",
                     Response.status(Response.Status.NOT_FOUND)
                             .location(uriInfo.getAbsolutePath())
                             .build()
@@ -85,12 +78,7 @@ public class BookResource {
             uriBuilder.queryParam("limit", limit);
         }
         final List<Book> books;
-        try {
-            books = repository.findBooks(offset, limit);
-        }
-        catch(Exception e) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
+        books = repository.findBooks(offset, limit);
 
 
         if(books.size()< 1) {
@@ -117,7 +105,7 @@ public class BookResource {
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(book.getISBN());
         Response.ResponseBuilder responseBuilder;
 
-        try {
+//        try {
             Book result;
             Publisher publisher = repository.findPublisherByCode(book.getPublisher().getCode());
             if(publisher == null) {
@@ -132,10 +120,10 @@ public class BookResource {
                 result = repository.newBook(Book.with(book, false).publisher(publisher).build());
                 responseBuilder = Response.created(uriBuilder.build()).entity(result);
             }
-        }
-        catch(Exception e) {
-            responseBuilder = Response.status(Response.Status.BAD_REQUEST).location(uriBuilder.build());
-        }
+//        }
+//        catch(Exception e) {
+//            responseBuilder = Response.status(Response.Status.BAD_REQUEST).location(uriBuilder.build());
+//        }
 
         return responseBuilder.build();
     }
@@ -173,13 +161,11 @@ public class BookResource {
         public static Date getDateFromString(String dateString) {
             try {
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                Date date = df.parse(dateString);
-                return date;
+                return df.parse(dateString);
             } catch (ParseException e) {
                 try {
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = df.parse(dateString);
-                    return date;
+                    return df.parse(dateString);
                 } catch (ParseException e2) {
                     //TODO: throw WebApplicationException ...
                     return null;

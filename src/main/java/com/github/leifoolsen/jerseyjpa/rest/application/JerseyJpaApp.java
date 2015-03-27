@@ -1,6 +1,8 @@
 package com.github.leifoolsen.jerseyjpa.rest.application;
 
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +18,11 @@ public class JerseyJpaApp extends ResourceConfig {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public JerseyJpaApp() {
-        packages("com.github.leifoolsen.jerseyjpa");
+        packages("com.github.leifoolsen.jerseyjpa.rest");
 
         // Enable LoggingFilter & output entity.
         //registerInstances(new LoggingFilter(java.util.logging.Logger.getLogger(JerseyJpaApp.class.getName()), true));
-        
+
         logger.debug("Application '{}' initialized", getClass().getName());
     }
 }
