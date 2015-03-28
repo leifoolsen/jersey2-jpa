@@ -9,6 +9,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,6 +26,7 @@ public class ErrorMessage {
     private Integer code;
     private String message;
     private String messageTemplate;
+    private String location;
 
     @XmlTransient
     private String stackTrace;
@@ -38,12 +40,13 @@ public class ErrorMessage {
         code = builder.code;
         message = builder.message;
         messageTemplate = builder.messageTemplate;
+        location = builder.location;
         stackTrace = builder.stackTrace;
         constraintViolationMessages = builder.constraintViolationMessages;
     }
 
-    public static Builder with(Throwable t) {
-        return new Builder(t);
+    public static Builder with(Throwable t, UriInfo uriInfo) {
+        return new Builder(t, uriInfo);
     }
 
     public String getId() {
@@ -64,6 +67,10 @@ public class ErrorMessage {
 
     public String getMessageTemplate() {
         return messageTemplate;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public String getStackTrace() {
@@ -99,10 +106,16 @@ public class ErrorMessage {
         private Integer code;
         private String message;
         private String messageTemplate;
+        private String location;
         private String stackTrace;
         private List<ConstraintViolationMessage> constraintViolationMessages;
 
-        private Builder(Throwable t) {
+        private Builder(Throwable t, UriInfo uriInfo) {
+
+            message = t.getMessage();
+            stackTrace = Throwables.getStackTraceAsString(t);
+            location = uriInfo.getAbsolutePath().toString();
+
             responseStatus = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
             if(t instanceof ConstraintViolationException) {
@@ -112,9 +125,6 @@ public class ErrorMessage {
                 responseStatus = ((WebApplicationException) t).getResponse().getStatus();
             }
 
-            message = t.getMessage();
-
-            stackTrace = Throwables.getStackTraceAsString(t);
 
             if(t instanceof ConstraintViolationException) {
                 ConstraintViolationException cve = (ConstraintViolationException)t;
@@ -126,11 +136,11 @@ public class ErrorMessage {
                 constraintViolationMessages = Lists.newArrayList();
                 for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
                     constraintViolationMessages.add(
-                        new ConstraintViolationMessage(
-                            constraintViolation.getMessage(),
-                            constraintViolation.getMessageTemplate(),
-                            constraintViolation.getPropertyPath(),
-                            constraintViolation.getInvalidValue()));
+                            new ConstraintViolationMessage(
+                                    constraintViolation.getMessage(),
+                                    constraintViolation.getMessageTemplate(),
+                                    constraintViolation.getPropertyPath(),
+                                    constraintViolation.getInvalidValue()));
                 }
             }
         }
@@ -156,4 +166,19 @@ public class ErrorMessage {
  * @param link point to page where the error is documented.
  * @param messageTemplate non-interpolated error message.
  * @param path instance path.
+ *
+ */
+
+/*
+            try {
+                // If the message itself is an ErrorMessage we'll use it to build a new message
+                ErrorMessage errorMessage = JaxbHelper.unMarshall(ErrorMessage.class, message);
+                responseStatus = errorMessage.status;
+                code = errorMessage.code;
+                message = errorMessage.message;
+                messageTemplate = errorMessage.messageTemplate;
+                location = errorMessage.location;
+                constraintViolationMessages = errorMessage.constraintViolationMessages;
+            }
+
  */

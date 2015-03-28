@@ -3,8 +3,6 @@ package com.github.leifoolsen.jerseyjpa.rest.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -25,7 +23,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable t) {
-        ErrorMessage errorMessage = ErrorMessage.with(t).build();
+        ErrorMessage errorMessage = ErrorMessage.with(t, uriInfo).build();
 
         logger.debug(errorMessage.toString());
 

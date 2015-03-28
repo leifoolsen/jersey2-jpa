@@ -3,9 +3,7 @@ package com.github.leifoolsen.jerseyjpa.rest.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Priority;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,7 +25,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
     @Override
     public Response toResponse(ConstraintViolationException exception) {
 
-        ErrorMessage errorMessage = ErrorMessage.with(exception).build();
+        ErrorMessage errorMessage = ErrorMessage.with(exception, uriInfo).build();
 
         logger.debug(errorMessage.toString());
 
