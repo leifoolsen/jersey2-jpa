@@ -11,9 +11,9 @@ import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-public class JAXBHelper {
+public class JaxbHelper {
 
-    private JAXBHelper() {}
+    private JaxbHelper() {}
 
     public static <T> String marshall(final T entity, boolean JAXBFormattedOutput) {
 

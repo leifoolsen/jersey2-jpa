@@ -1,6 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.rest.exception;
 
-import com.github.leifoolsen.jerseyjpa.util.JAXBHelper;
+import com.github.leifoolsen.jerseyjpa.util.JaxbHelper;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -75,14 +75,14 @@ public class ErrorMessage {
     }
 
     public String toJSON() {
-        return JAXBHelper.marshall(this, false);
+        return JaxbHelper.marshall(this, false);
     }
 
     @Override
     public String toString() {
 
         try {
-            return JAXBHelper.marshall(this, true);
+            return JaxbHelper.marshall(this, true);
         }
         catch (Exception e) {
             return "Marshalling failed with message: " + e.getMessage() +
