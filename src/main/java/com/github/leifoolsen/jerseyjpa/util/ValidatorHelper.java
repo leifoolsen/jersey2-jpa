@@ -13,7 +13,7 @@ public class ValidatorHelper {
 
     public static <T> void validate(final T entity) {
         if(entity == null) {
-            throw new ConstraintViolationException("Book may not be null.", new HashSet<ConstraintViolation<?>>());
+            throw new ConstraintViolationException("Entity may not be null.", new HashSet<ConstraintViolation<?>>());
         }
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(entity);
