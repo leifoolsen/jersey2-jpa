@@ -5,7 +5,7 @@ using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence.
 ## Steps to run this project
 * Fork, Clone or Download ZIP
 * Build project: mvn clean install -U
-* Start Jetty: mvn exec:java
+* Start Jetty: mvn exec:java, or execute main method in com.github.leifoolsen.jerseyjpa.main.JettyStarter.java
 * Application.wadl: http://localhost:8080/api/application.wadl
 * Example usage: http://localhost:8080/api/books
 * Import project into your favourite IDE
