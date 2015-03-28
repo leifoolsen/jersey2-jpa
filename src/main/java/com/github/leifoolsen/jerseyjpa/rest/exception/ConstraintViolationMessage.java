@@ -20,7 +20,7 @@ public class ConstraintViolationMessage {
     protected ConstraintViolationMessage() {}
 
     /**
-     * Create a {@code PropertyErrorMessage} instance.
+     * Create a {@code ConstraintViolationMessage} instance.
      *
      * @param message interpolated error message.
      * @param messageTemplate non-interpolated error message.

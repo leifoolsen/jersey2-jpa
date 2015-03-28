@@ -1,12 +1,12 @@
 package com.github.leifoolsen.jerseyjpa.rest.resource;
 
+import com.github.leifoolsen.jerseyjpa.domain.Book;
+import com.github.leifoolsen.jerseyjpa.domain.Publisher;
+import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
+import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.rest.exception.ErrorMessage;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
-import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
-import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
-import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
-import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -21,7 +21,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -86,7 +85,7 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), errorMessage.getStatus());
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), errorMessage.getResponseStatusCode());
     }
 
     @Test
@@ -99,7 +98,7 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), errorMessage.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), errorMessage.getResponseStatusCode());
     }
 
     @Test
@@ -143,6 +142,27 @@ public class BookResourceTest {
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void newBookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {
+
+        final Publisher nonExistingPublisher = new Publisher("22222", "Does not exist");
+        final Book book = Book
+                .with("9788202289331")
+                .publisher(nonExistingPublisher)
+                .title("A title")
+                .author("Loe, Erlend")
+                .published(new GregorianCalendar(2008, 1, 1).getTime())
+                .summary("Lorem ipsum etc")
+                .build();
+
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        String errorMessage = response.readEntity(String.class);
+    }
 
     @Test
     public void newBookShouldReturn_x() {
@@ -164,7 +184,6 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String errorMessage = response.readEntity(String.class);
-        logger.debug(errorMessage);
     }
 
     @Test
@@ -195,7 +214,7 @@ public class BookResourceTest {
                 .request(MediaType.APPLICATION_XML)
                 .get();
 
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(), response.getResponseStatusCode());
     }
     */
 }

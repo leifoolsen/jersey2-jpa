@@ -27,7 +27,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 
         logger.debug(errorMessage.toString());
 
-        return Response.status(errorMessage.getStatus())
+        return Response.status(errorMessage.getResponseStatusCode())
                 .entity(errorMessage)
                 .location(uriInfo.getAbsolutePath())
                 .type(MediaType.APPLICATION_JSON)

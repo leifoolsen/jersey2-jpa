@@ -1,20 +1,27 @@
 package com.github.leifoolsen.jerseyjpa.rest.resource;
 
-import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
+import com.github.leifoolsen.jerseyjpa.exception.ApplicationException;
 import com.github.leifoolsen.jerseyjpa.repository.BookRepositoryJpa;
 import com.github.leifoolsen.jerseyjpa.repository.DatabaseConnection;
+import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -109,7 +116,8 @@ public class BookResource {
             Book result;
             Publisher publisher = repository.findPublisherByCode(book.getPublisher().getCode());
             if(publisher == null) {
-                throw new EntityNotFoundException("Publisher " + book.getPublisher().getCode() + " not found");
+                throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
+                        "Could not create book. Publisher " + book.getPublisher().getCode() + " not found", null);
             }
 
             if(repository.findBook(book.getId()) != null) {
@@ -127,15 +135,6 @@ public class BookResource {
 
         return responseBuilder.build();
     }
-
-
-    /*
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrUpdate(final List<Book>books) {
-        return Response.serverError().build();
-    }
-    */
 
 
     @GET

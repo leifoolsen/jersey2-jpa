@@ -1,10 +1,12 @@
 package com.github.leifoolsen.jerseyjpa.rest.exception;
 
+import com.github.leifoolsen.jerseyjpa.exception.ApplicationException;
 import com.github.leifoolsen.jerseyjpa.util.JaxbHelper;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.WebApplicationException;
@@ -15,79 +17,132 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ErrorMessage {
-
     private String id = UUID.randomUUID().toString();
-    private int status;
-    private Integer code;
+    private int responseStatusCode;
+    private Integer errorCode;
     private String message;
     private String messageTemplate;
     private String location;
+    private List<ConstraintViolationMessage> constraintViolationMessages;
 
     @XmlTransient
     private String stackTrace;
 
-    private List<ConstraintViolationMessage> constraintViolationMessages;
-
     protected ErrorMessage() {}
 
     private ErrorMessage(Builder builder) {
-        status = builder.responseStatus;
-        code = builder.code;
+        responseStatusCode = builder.responseStatusCode;
+        errorCode = builder.errorCode;
         message = builder.message;
         messageTemplate = builder.messageTemplate;
         location = builder.location;
-        stackTrace = builder.stackTrace;
         constraintViolationMessages = builder.constraintViolationMessages;
+        stackTrace = builder.stackTrace;
     }
 
+    /**
+     *
+     * @param  t the exception we're building an error message for
+     * @param  uriInfo provides access to application and request
+     *         URI information. Relative URIs are relative to the base URI of the
+     *         application, see {@link UriInfo#getBaseUri}.
+     * @return the error message
+     */
     public static Builder with(Throwable t, UriInfo uriInfo) {
         return new Builder(t, uriInfo);
     }
 
+    /**
+     *
+     * @param status The HTTP Status errorCode that should be returned by the server. <br />
+     *         See {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">HTTP/1.1 documentation</a>}
+     *         for list of status codes. Additional status codes can be added by applications
+     *         by creating an implementation of {@link javax.ws.rs.core.Response.StatusType}.
+     * @param message interpolated error message.
+     * @return the error message
+     */
+    public static Builder with(Response.Status status, String message) {
+        return new Builder(status, message);
+    }
+
+
+    /**
+     * @return message id
+     */
     public String getId() {
         return id;
     }
 
-    public int getStatus() {
-        return status;
+    /**
+     * @return The HTTP Status errorCode that should be returned by the server. <br />
+     *         See {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">HTTP/1.1 documentation</a>}
+     *         for list of status codes. Additional status codes can be added by applications
+     *         by creating an implementation of {@link javax.ws.rs.core.Response.StatusType}.
+     */
+    public int getResponseStatusCode() {
+        return responseStatusCode;
     }
 
-    public Integer getCode() {
-        return code;
+    /**
+     * @return application specific error errorCode
+     */
+    public Integer getErrorCode() {
+        return errorCode;
     }
 
+    /**
+     * @return interpolated error message.
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * @return non-interpolated error message.
+     */
     public String getMessageTemplate() {
         return messageTemplate;
     }
 
+    /**
+     * @return path to resource method
+     */
     public String getLocation() {
         return location;
     }
 
+    /**
+     * @return stack trace caused by the exception
+     */
     public String getStackTrace() {
         return stackTrace;
     }
 
+    /**
+     * @return a list of {@code ConstraintViolationMessage} messages.
+     */
     public List<ConstraintViolationMessage> getConstraintViolationMessages() {
         return constraintViolationMessages;
     }
 
+    /**
+     * @return a JSON formatted representation of the error message
+     */
     public String toJSON() {
         return JaxbHelper.marshall(this, false);
     }
 
+    /**
+     * @return a JSON formatted, pretty print, representation of the error message
+     */
     @Override
     public String toString() {
-
         try {
             return JaxbHelper.marshall(this, true);
         }
@@ -95,15 +150,28 @@ public class ErrorMessage {
             return "Marshalling failed with message: " + e.getMessage() +
                     "Fallback {" +
                     "id='" + id + '\'' +
-                    ", status=" + status +
+                    ", responseStatusCode=" + responseStatusCode +
                     ", message='" + message + '\'' +
                     '}';
         }
     }
 
+    /**
+     * @param jsonString JSON representation of the ErrorMessage
+     * @return ErrorMessage instance
+     */
+    public static ErrorMessage fromJSON(final String jsonString) {
+        return JaxbHelper.unMarshall(ErrorMessage.class, jsonString);
+    }
+
+
+    // --------------------------
+    //
+    // --------------------------
+
     public static class Builder {
-        private int responseStatus;
-        private Integer code;
+        private int responseStatusCode;
+        private Integer errorCode;
         private String message;
         private String messageTemplate;
         private String location;
@@ -116,69 +184,88 @@ public class ErrorMessage {
             stackTrace = Throwables.getStackTraceAsString(t);
             location = uriInfo.getAbsolutePath().toString();
 
-            responseStatus = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+            responseStatusCode = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
             if(t instanceof ConstraintViolationException) {
-                responseStatus = Response.Status.BAD_REQUEST.getStatusCode();
+                responseStatusCode = Response.Status.BAD_REQUEST.getStatusCode();
+            }
+            else if (t instanceof EntityNotFoundException) {
+                responseStatusCode = Response.Status.NOT_FOUND.getStatusCode();
             }
             else if(t instanceof WebApplicationException) {
-                responseStatus = ((WebApplicationException) t).getResponse().getStatus();
+                responseStatusCode = ((WebApplicationException) t).getResponse().getStatus();
+            }
+            else if (t instanceof ApplicationException) {
+                responseStatusCode = ((ApplicationException) t).getResponseStatusCode();
+                errorCode = ((ApplicationException) t).getErrorCode();
+                messageTemplate = ((ApplicationException) t).getMessageTemplate();
             }
 
+            // Look for constraint violations in this exception or in exception cause
+            ConstraintViolationException cve = t instanceof ConstraintViolationException
+                    ? (ConstraintViolationException)t
+                    : t.getCause() instanceof ConstraintViolationException
+                            ? (ConstraintViolationException)t.getCause()
+                            : null;
 
-            if(t instanceof ConstraintViolationException) {
-                ConstraintViolationException cve = (ConstraintViolationException)t;
-
+            if(cve != null) {
                 if(MoreObjects.firstNonNull(message, "").trim().length() < 1) {
                     message = "Bean Validation constraint(s) violated.";
                 }
+                constraintViolationMessages = createConstraintViolationMessages(cve.getConstraintViolations());
+            }
+        }
 
-                constraintViolationMessages = Lists.newArrayList();
-                for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
-                    constraintViolationMessages.add(
-                            new ConstraintViolationMessage(
+        private Builder(Response.Status status, String message) {
+            this.responseStatusCode = status.getStatusCode();
+            this.message = message;
+        }
+
+
+        public Builder errorCode(Integer errorCode) {
+            this.errorCode = errorCode;
+            return this;
+        }
+
+        public Builder messageTemplate(String messageTemplate) {
+            this.messageTemplate = messageTemplate;
+            return this;
+        }
+
+        public Builder location(String location) {
+            this.location = location;
+            return this;
+        }
+
+        public Builder stackTrace(String stackTrace) {
+            this.stackTrace = stackTrace;
+            return this;
+        }
+
+        public Builder constraintViolations(Set<ConstraintViolation<?>> constraintViolations) {
+            constraintViolationMessages = createConstraintViolationMessages(constraintViolations);
+            return this;
+        }
+
+        private static List<ConstraintViolationMessage> createConstraintViolationMessages(
+                Set<ConstraintViolation<?>> constraintViolations) {
+
+            List<ConstraintViolationMessage> result = Lists.newArrayList();
+            if(constraintViolations != null) {
+                for (ConstraintViolation<?> constraintViolation : constraintViolations) {
+                    result.add(new ConstraintViolationMessage(
                                     constraintViolation.getMessage(),
                                     constraintViolation.getMessageTemplate(),
                                     constraintViolation.getPropertyPath(),
                                     constraintViolation.getInvalidValue()));
                 }
             }
+            return result;
         }
+
 
         public ErrorMessage build() {
             return new ErrorMessage(this);
         }
     }
 }
-
-
-
-
-/*
- * Create a {@code ErrorMessage} instance.
- *
- * @param status  HTTP Status code returned by the server. <br />
- *                See {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">HTTP/1.1 documentation</a>}
- *                for list of status codes. Additional status codes can be added by applications
- *                by creating an implementation of {@link javax.ws.rs.core.Response.StatusType}.
- * @param code application specific error code
- * @param message interpolated error message.
- * @param link point to page where the error is documented.
- * @param messageTemplate non-interpolated error message.
- * @param path instance path.
- *
- */
-
-/*
-            try {
-                // If the message itself is an ErrorMessage we'll use it to build a new message
-                ErrorMessage errorMessage = JaxbHelper.unMarshall(ErrorMessage.class, message);
-                responseStatus = errorMessage.status;
-                code = errorMessage.code;
-                message = errorMessage.message;
-                messageTemplate = errorMessage.messageTemplate;
-                location = errorMessage.location;
-                constraintViolationMessages = errorMessage.constraintViolationMessages;
-            }
-
- */
