@@ -84,8 +84,7 @@ public class BookResource {
         if(limit != null) {
             uriBuilder.queryParam("limit", limit);
         }
-        final List<Book> books;
-        books = repository.findBooks(offset, limit);
+        final List<Book> books = repository.findBooks(offset, limit);
 
 
         if(books.size()< 1) {

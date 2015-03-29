@@ -164,29 +164,7 @@ public class BookResourceTest {
         String errorMessage = response.readEntity(String.class);
     }
 
-    @Test
-    public void newBookShouldReturn_x() {
-
-        final Publisher publisher = new Publisher(DomainPopulator.CAPPELEN_DAMM, "Cappelen Damm");
-        final Book book = Book
-                .with("0293")
-                .publisher(publisher)
-                .title(null)
-                .author("Loe, Erlend")
-                .published(new GregorianCalendar(2008, 1, 1).getTime())
-                .summary("Lorem ipsum etc")
-                .build();
-
-        final Response response = target
-                .path(BookResource.RESOURCE_PATH)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .put(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String errorMessage = response.readEntity(String.class);
-    }
-
-    @Test
+    //@Test
     public void updateBookShouldReturn_OK() {
 
     }

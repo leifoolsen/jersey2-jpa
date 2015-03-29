@@ -29,7 +29,8 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
 
         logger.debug(errorMessage.toString());
 
-        return Response.status(errorMessage.getResponseStatusCode())
+        return Response
+                .status(errorMessage.getResponseStatusCode())
                 .entity(errorMessage)
                 .location(uriInfo.getAbsolutePath())
                 .type(MediaType.APPLICATION_JSON)

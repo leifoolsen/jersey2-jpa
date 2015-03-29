@@ -11,10 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -22,8 +18,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @XmlRootElement
@@ -106,9 +100,9 @@ public class Book {
      * @return the formatted ISBN number
      */
     public String formattedISBN() {
-        return  isbn.substring(0, 3) + "-" +
-                isbn.substring(3, 4) + "-" +
-                isbn.substring(4, 9) + "-" +
+        return  isbn.substring(0, 3)  + "-" +
+                isbn.substring(3, 4)  + "-" +
+                isbn.substring(4, 9)  + "-" +
                 isbn.substring(9, 12) + "-" +
                 isbn.substring(12);
     }
@@ -143,9 +137,9 @@ public class Book {
         Builder b = new Builder(source.isbn)
                 .title(source.title)
                 .author(source.author)
-                .publisher(source.publisher)
                 .published(source.published)
-                .summary(source.summary);
+                .summary(source.summary)
+                .publisher(source.publisher);
 
         if(copyId) {
             b.id(source.id).version(source.version);
