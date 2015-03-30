@@ -26,6 +26,7 @@ public class ErrorMessage {
     private String id = UUID.randomUUID().toString();
     private int responseStatusCode;
     private Integer errorCode;
+    private String exceptionClass;
     private String message;
     private String messageTemplate;
     private String location;
@@ -39,6 +40,7 @@ public class ErrorMessage {
     private ErrorMessage(Builder builder) {
         responseStatusCode = builder.responseStatusCode;
         errorCode = builder.errorCode;
+        exceptionClass = builder.exceptionClass;
         message = builder.message;
         messageTemplate = builder.messageTemplate;
         location = builder.location;
@@ -48,7 +50,7 @@ public class ErrorMessage {
 
     /**
      *
-     * @param  t the exception we're building an error message for
+     * @param  t the exceptionClass we're building an error message for
      * @param  uriInfo provides access to application and request
      *         URI information. Relative URIs are relative to the base URI of the
      *         application, see {@link UriInfo#getBaseUri}.
@@ -97,6 +99,12 @@ public class ErrorMessage {
     }
 
     /**
+     * @return the exceptionClass
+     */
+    public String getExceptionClass() {
+        return exceptionClass;
+    }
+    /**
      * @return interpolated error message.
      */
     public String getMessage() {
@@ -118,7 +126,7 @@ public class ErrorMessage {
     }
 
     /**
-     * @return stack trace caused by the exception
+     * @return stack trace caused by the exceptionClass
      */
     public String getStackTrace() {
         return stackTrace;
@@ -172,6 +180,7 @@ public class ErrorMessage {
     public static class Builder {
         private int responseStatusCode;
         private Integer errorCode;
+        private String exceptionClass;
         private String message;
         private String messageTemplate;
         private String location;
@@ -180,6 +189,7 @@ public class ErrorMessage {
 
         private Builder(Throwable t, UriInfo uriInfo) {
 
+            exceptionClass = t.getClass().getName();
             message = t.getMessage();
             stackTrace = Throwables.getStackTraceAsString(t);
             location = uriInfo.getAbsolutePath().toString();
@@ -201,7 +211,7 @@ public class ErrorMessage {
                 messageTemplate = ((ApplicationException) t).getMessageTemplate();
             }
 
-            // Look for constraint violations in this exception or in exception cause
+            // Look for constraint violations in this exceptionClass or in exceptionClass cause
             ConstraintViolationException cve = t instanceof ConstraintViolationException
                     ? (ConstraintViolationException)t
                     : t.getCause() instanceof ConstraintViolationException
@@ -224,6 +234,11 @@ public class ErrorMessage {
 
         public Builder errorCode(Integer errorCode) {
             this.errorCode = errorCode;
+            return this;
+        }
+
+        public Builder exceptionClass(String exceptionClass) {
+            this.exceptionClass = exceptionClass;
             return this;
         }
 

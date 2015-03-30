@@ -34,6 +34,7 @@ public class BookResourceTest {
     private static final String ISBN_NOT_IN_DATABSE = "1111111111111";
     private static final String ISBN_TRAVELING_TO_INFINITY = "9781846883668";
     private static final String ISBN_VREDENS_DRUER = "9788253019727";
+    private static final String ISBN_GUIDE_TO_MIDDLE_EARTH = "9780752495620";
 
     private static Server server;
     private static WebTarget target;
@@ -168,6 +169,36 @@ public class BookResourceTest {
     public void updateBookShouldReturn_OK() {
 
     }
+
+
+    @Test
+    public void deleteBookShouldReturn_NO_CONTENT() {
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_GUIDE_TO_MIDDLE_EARTH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_GUIDE_TO_MIDDLE_EARTH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_GUIDE_TO_MIDDLE_EARTH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+    }
+
 
 
     @Test

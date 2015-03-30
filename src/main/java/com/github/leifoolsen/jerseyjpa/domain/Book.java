@@ -53,7 +53,7 @@ public class Book {
 
     @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name="publisher_id")
+    @JoinColumn(name="publisher_id", nullable = false)
     private Publisher publisher;
 
     protected Book() {}

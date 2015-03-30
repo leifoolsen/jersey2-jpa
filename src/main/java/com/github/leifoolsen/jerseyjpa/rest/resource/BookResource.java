@@ -15,7 +15,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -64,7 +66,7 @@ public class BookResource {
         final Book result = repository.findBookByISBN(isbn);
 
         if (result == null) {
-            throw new WebApplicationException("Book with isbn: '"+ isbn + "' not found",
+            throw new WebApplicationException("Book with isbn: '"+ isbn + "' was not found",
                     Response.status(Response.Status.NOT_FOUND)
                             .location(uriInfo.getAbsolutePath())
                             .build()
@@ -104,6 +106,12 @@ public class BookResource {
                 .build();
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(final Book book) {
+        return null;
+    }
+
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdate(final Book book) {
@@ -113,10 +121,13 @@ public class BookResource {
 
 //        try {
             Book result;
+
+
             Publisher publisher = repository.findPublisherByCode(book.getPublisher().getCode());
             if(publisher == null) {
                 throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
-                        "Could not create book. Publisher " + book.getPublisher().getCode() + " not found", null);
+                        "Could not create or update book. Publisher with code "
+                                + book.getPublisher().getCode() + " was not found", null);
             }
 
             if(repository.findBook(book.getId()) != null) {
@@ -135,8 +146,19 @@ public class BookResource {
         return responseBuilder.build();
     }
 
+    @DELETE
+    @Path("{isbn}")
+    public void delete(@PathParam("isbn") final String isbn) {
+        Book book = repository.findBookByISBN(isbn);
+        if(book != null) {
+            repository.deleteBook(book);
+            logger.debug("Book with isbn: '{}' deleted", isbn);
+        }
+        // void method returns Response.Status.NO_CONTENT
+    }
 
-    @GET
+
+        @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("ping")
     public String ping() {
