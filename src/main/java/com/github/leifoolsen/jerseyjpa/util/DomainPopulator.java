@@ -53,7 +53,7 @@ public class DomainPopulator {
     public static List<Book> getBooks(final Map<String, Publisher> publishers) {
 
         // Add some books
-        final List<Book> books = Arrays.asList(
+        return Arrays.asList(
             Book.with("9781846883668")
                     .title("Travelling to Infinity: The True Story")
                     .author("Hawking, Jane")
@@ -107,7 +107,7 @@ public class DomainPopulator {
                     .build(),
 
             Book.with("9788253019727")
-                    .title("Vredens duer")
+                    .title("Verdens duer")
                     .author("Steinbeck, John")
                     .publisher(publishers.get(PAX))
                     .published(new GregorianCalendar(1998, 1, 1).getTime())
@@ -350,7 +350,5 @@ public class DomainPopulator {
                             "to 40 - something Manhattanite with a receding hairline and a memoir to write.")
                     .build()
         );
-
-        return books;
     }
 }

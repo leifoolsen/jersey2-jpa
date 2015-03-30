@@ -18,14 +18,17 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public class BookResourceTest {
@@ -113,8 +116,52 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {
+        });
         assertThat(result, hasSize(5));
+    }
+
+    @Test
+    public void newBookWithBeanParamShouldReturn_CREATED() {
+        Form form = new Form();
+        form.param("isbn", "9780297871934")
+                .param("title", "Accidence Will Happen : The Non-Pedantic Guide to English Usage")
+                .param("author", "Kamm, Oliver")
+                .param("published", "2015-02-12")
+                .param("translator", null)
+                .param("summary", "Are standards of English alright - or should that be all right? To knowingly " +
+                        "split an infinitive or not to? And what about ending a sentence with preposition, or for " +
+                        "that matter beginning one with 'and'? We learn language by instinct, but good English, " +
+                        "the pedants tell us, requires rules. Yet, as Oliver Kamm demonstrates, many of the purists' " +
+                        "prohibitions are bogus and can be cheerfully disregarded. ACCIDENCE WILL HAPPEN is an " +
+                        "authoritative and deeply reassuring guide to grammar, style and the linguistic conundrums " +
+                        "we all face.")
+                .param("publisher-code", "02978");
+
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    public void newBookWithBeanParamMissingRequiredFieldShouldReturn_BAD_REQUEST() {
+        Form form = new Form();
+        form.param("isbn", "9780857520197")
+                .param("author", "Watson, S. J.")
+                .param("published", "2015-02-12")
+                .param("translator", null)
+                .param("summary", "The sensational new psychological thriller from ... ");
+
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
 
@@ -144,7 +191,7 @@ public class BookResourceTest {
     }
 
     @Test
-    public void newBookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {
+    public void bookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {
 
         final Publisher nonExistingPublisher = new Publisher("22222", "Does not exist");
         final Book book = Book
@@ -165,9 +212,50 @@ public class BookResourceTest {
         String errorMessage = response.readEntity(String.class);
     }
 
-    //@Test
-    public void updateBookShouldReturn_OK() {
+    @Test
+    public void newBookShouldReturn_CONFLICT() {
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_VREDENS_DRUER)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
 
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Book existingBook = response.readEntity(Book.class);
+
+        Book duplicatedBook = Book.with(existingBook, false).build();
+
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.entity(duplicatedBook, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+
+
+    @Test
+    public void updateBookShouldReturn_OK() {
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_VREDENS_DRUER)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Book bookToUpdate = response.readEntity(Book.class);
+        assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
+
+        Book updatedBook = Book.with(bookToUpdate, true).title("Vredens druer").build();
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.entity(updatedBook, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Book b = response.readEntity(Book.class);
+        assertThat(b.getTitle(), equalTo("Vredens druer"));
     }
 
 

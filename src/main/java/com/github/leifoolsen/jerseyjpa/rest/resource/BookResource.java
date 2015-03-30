@@ -5,8 +5,11 @@ import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.exception.ApplicationException;
 import com.github.leifoolsen.jerseyjpa.repository.BookRepositoryJpa;
 import com.github.leifoolsen.jerseyjpa.repository.DatabaseConnection;
+import com.github.leifoolsen.jerseyjpa.rest.dto.BookDTO;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
+import com.google.common.base.MoreObjects;
+import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,16 +17,7 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -107,9 +101,46 @@ public class BookResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(final Book book) {
-        return null;
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response create(@BeanParam final BookDTO params) {
+        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(params.isbn);
+        Response.ResponseBuilder responseBuilder;
+
+        Publisher publisher = null;
+        String p = blankToNull(params.publisherCode);
+        if(p != null) {
+            publisher = repository.findPublisherByCode(params.publisherCode);
+
+            if (publisher == null) {
+                throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
+                        "Could not create book. Publisher with code "
+                                + params.publisherCode + " was not found", null);
+            }
+        }
+
+        Book result = repository.findBookByISBN(params.isbn);
+        if(result != null) {
+            throw new WebApplicationException(
+                    "Could not create book with ISBN: '" + params.isbn + "'. Book already in database.",
+                    Response.status(Response.Status.CONFLICT)
+                            .location(uriInfo.getAbsolutePath())
+                            .build());
+        }
+
+        result = Book.with(params.isbn)
+                .title(params.title)
+                .author(params.author)
+                .published(params.published != null ? params.published.getDate() : null)
+                .translator(params.translator)
+                .summary(params.summary)
+                .publisher(publisher)
+                .build();
+
+        result = repository.newBook(result);
+        responseBuilder = Response.created(uriBuilder.build()).entity(result);
+        logger.debug("Created book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+
+        return responseBuilder.build();
     }
 
     @PUT
@@ -133,10 +164,22 @@ public class BookResource {
             if(repository.findBook(book.getId()) != null) {
                 result = repository.updateBook(Book.with(book, true).publisher(publisher).build());
                 responseBuilder = Response.ok(result).location(uriBuilder.build());
+                logger.debug("Updated book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
             }
             else {
-                result = repository.newBook(Book.with(book, false).publisher(publisher).build());
-                responseBuilder = Response.created(uriBuilder.build()).entity(result);
+                result = repository.findBookByISBN(book.getISBN());
+                if(result == null) {
+                    result = repository.newBook(Book.with(book, false).publisher(publisher).build());
+                    responseBuilder = Response.created(uriBuilder.build()).entity(result);
+                    logger.debug("Created book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+                }
+                else {
+                    throw new WebApplicationException(
+                            "Could not create book with ISBN: '" + book.getISBN() + "'. Book already in database.",
+                            Response.status(Response.Status.CONFLICT)
+                                    .location(uriInfo.getAbsolutePath())
+                                    .build());
+                }
             }
 //        }
 //        catch(Exception e) {
@@ -158,7 +201,7 @@ public class BookResource {
     }
 
 
-        @GET
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("ping")
     public String ping() {
@@ -166,33 +209,9 @@ public class BookResource {
     }
 
 
-
-    public static class DateAdapter {
-        private Date date;
-
-        public DateAdapter(String date){
-            this.date = getDateFromString(date);
-        }
-
-        public Date getDate(){
-            return this.date;
-        }
-
-        public static Date getDateFromString(String dateString) {
-            try {
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                return df.parse(dateString);
-            } catch (ParseException e) {
-                try {
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    return df.parse(dateString);
-                } catch (ParseException e2) {
-                    //TODO: throw WebApplicationException ...
-                    return null;
-                }
-            }
-        }
+    private static String blankToNull(final String value) {
+        String s = MoreObjects.firstNonNull(value, "").trim();
+        return s.length() > 0 ? s : null;
     }
-
 
 }
