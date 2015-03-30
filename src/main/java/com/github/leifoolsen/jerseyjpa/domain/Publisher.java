@@ -52,9 +52,8 @@ public class Publisher {
 
         Publisher publisher = (Publisher) o;
 
-        if (!code.equals(publisher.code)) return false;
+        return code.equals(publisher.code);
 
-        return true;
     }
 
     @Override

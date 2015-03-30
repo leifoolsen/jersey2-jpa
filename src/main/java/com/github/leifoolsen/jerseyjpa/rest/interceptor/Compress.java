@@ -1,9 +1,8 @@
 package com.github.leifoolsen.jerseyjpa.rest.interceptor;
 
+import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import javax.ws.rs.NameBinding;
 
 
 /**

@@ -20,7 +20,7 @@ public class ApplicationException extends RuntimeException {
      * @param messageTemplate the non-interpolated error message.
      */
     public ApplicationException(int responseStatusCode, Integer errorCode, String message, String messageTemplate) {
-        this(responseStatusCode, errorCode, message, messageTemplate, (Throwable) null);
+        this(responseStatusCode, errorCode, message, messageTemplate, null);
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.main;
 
-import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
+import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.google.common.base.MoreObjects;
 import com.google.common.primitives.Ints;
 import org.eclipse.jetty.server.Server;

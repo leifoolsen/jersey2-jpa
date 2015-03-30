@@ -2,9 +2,9 @@ package com.github.leifoolsen.jerseyjpa.repository;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
+import com.github.leifoolsen.jerseyjpa.util.QueryParameter;
 import com.github.leifoolsen.jerseyjpa.util.Repository;
 import com.github.leifoolsen.jerseyjpa.util.RepositoryJPA;
-import com.github.leifoolsen.jerseyjpa.util.QueryParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

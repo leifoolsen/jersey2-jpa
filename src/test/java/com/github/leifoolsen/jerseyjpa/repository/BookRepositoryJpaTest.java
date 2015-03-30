@@ -1,9 +1,9 @@
 package com.github.leifoolsen.jerseyjpa.repository;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
-import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.util.DatabasePopulator;
+import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import org.junit.After;
 import org.junit.AfterClass;
