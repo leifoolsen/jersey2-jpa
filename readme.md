@@ -15,6 +15,8 @@ using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence.
     * ReaderInterceptor to deflate GZIP on client side
 * ExceptionMapper
     * Mapping all exceptions to responses and sending a uniform ErrorMessage as JSON to the client
+* @BeanParam
+    * To inject parameters from Form POST and PUT
 
 ## Steps to run this project
 * Fork, Clone or Download ZIP
