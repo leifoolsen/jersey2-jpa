@@ -40,8 +40,6 @@ public class DatabaseConnection {
 
         properties.put("eclipselink.ddl-generation", "drop-and-create-tables");
         properties.put("eclipselink.ddl-generation.output-mode", "database");
-        properties.put("eclipselink.jdbc.batch-writing", "JDBC");
-        properties.put("eclipselink.jdbc.batch-writing.size", "1000");
         properties.put("eclipselink.logging.level", "OFF");  // OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL
         properties.put("eclipselink.logging.level.sql", "INFO");
         properties.put("eclipselink.logging.parameters", "true");
@@ -49,6 +47,15 @@ public class DatabaseConnection {
         properties.put("eclipselink.logging.session", "true");
         properties.put("eclipselink.logging.thread", "true");
         properties.put("eclipselink.logging.exceptions", "true");
+
+        // EL optimization, see: http://java-persistence-performance.blogspot.no/2011/06/how-to-improve-jpa-performance-by-1825.html
+        properties.put("eclipselink.jdbc.cache-statements", "true");
+        properties.put("eclipselink.jdbc.batch-writing", "JDBC");
+        properties.put("eclipselink.jdbc.batch-writing.size", "1000");
+        properties.put("eclipselink.persistence-context.flush-mode", "commit");
+        properties.put("eclipselink.persistence-context.close-on-commit", "true");
+        properties.put("eclipselink.persistence-context.persist-on-commit", "false");
+        properties.put("eclipselink.flush-clear.cache", "drop");
 
         // Add entity classes, Eclipselink
         properties.put("eclipselink.metadata-source", "XML");
