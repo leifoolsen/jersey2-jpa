@@ -152,53 +152,47 @@ public class BookResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createOrUpdate(@BeanParam final BookDTO params) {
 
-        return Response.ok().build();
+        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(params.isbn);
+        Response.ResponseBuilder responseBuilder;
+
+        Publisher publisher = null;
+        String p = blankToNull(params.publisherCode);
+        if(p != null) {
+            publisher = repository.findPublisherByCode(params.publisherCode);
+
+            if (publisher == null) {
+                throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
+                        "Could not create book. Publisher with code "
+                                + params.publisherCode + " was not found", null);
+            }
+        }
+
+        Book.Builder builder = Book.with(params.isbn)
+                .title(params.title)
+                .author(params.author)
+                .published(params.published != null ? params.published.getDate() : null)
+                .translator(params.translator)
+                .summary(params.summary)
+                .publisher(publisher);
+
+        Book result = repository.findBookByISBN(params.isbn);
+        if(result != null) {
+            result = repository.updateBook(builder.id(result.getId()).version(result.getVersion()).build());
+            responseBuilder = Response.ok(result).location(uriBuilder.build());
+            logger.debug("Updated book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+        }
+        else {
+            result = repository.newBook(builder.build());
+            responseBuilder = Response.created(uriBuilder.build()).entity(result);
+            logger.debug("Created book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+        }
+        return responseBuilder.build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdate(final Book book) {
-
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(book.getISBN());
-        Response.ResponseBuilder responseBuilder;
-
-//        try {
-            Book result;
-
-
-            Publisher publisher = repository.findPublisherByCode(book.getPublisher().getCode());
-            if(publisher == null) {
-                throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
-                        "Could not create or update book. Publisher with code "
-                                + book.getPublisher().getCode() + " was not found", null);
-            }
-
-            if(repository.findBook(book.getId()) != null) {
-                result = repository.updateBook(Book.with(book, true).publisher(publisher).build());
-                responseBuilder = Response.ok(result).location(uriBuilder.build());
-                logger.debug("Updated book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
-            }
-            else {
-                result = repository.findBookByISBN(book.getISBN());
-                if(result == null) {
-                    result = repository.newBook(Book.with(book, false).publisher(publisher).build());
-                    responseBuilder = Response.created(uriBuilder.build()).entity(result);
-                    logger.debug("Created book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
-                }
-                else {
-                    throw new WebApplicationException(
-                            "Could not create book with ISBN: '" + book.getISBN() + "'. Book already in database.",
-                            Response.status(Response.Status.CONFLICT)
-                                    .location(uriInfo.getAbsolutePath())
-                                    .build());
-                }
-            }
-//        }
-//        catch(Exception e) {
-//            responseBuilder = Response.status(Response.Status.BAD_REQUEST).location(uriBuilder.build());
-//        }
-
-        return responseBuilder.build();
+        return createOrUpdate(new BookDTO(book));
     }
 
     @DELETE

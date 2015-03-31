@@ -121,7 +121,7 @@ public class BookResourceTest {
     }
 
     @Test
-    public void newBookWithBeanParamShouldReturn_CREATED() {
+    public void newBookWithFormPostShouldReturn_CREATED() {
         Form form = new Form()
             .param("isbn", "9780297871934")
             .param("title", "Accidence Will Happen : The Non-Pedantic Guide to English Usage")
@@ -146,7 +146,7 @@ public class BookResourceTest {
     }
 
     @Test
-    public void newBookWithBeanParamMissingRequiredFieldShouldReturn_BAD_REQUEST() {
+    public void newBookWithFormPostMissingRequiredFieldShouldReturn_BAD_REQUEST() {
         Form form = new Form()
             .param("isbn", "9780857520197")
             .param("author", "Watson, S. J.")
@@ -163,12 +163,12 @@ public class BookResourceTest {
     }
 
     @Test
-    public void newBookShouldReturn_x() {
+    public void newBookWithFormPutShouldReturn_CREADTED() {
         Form form = new Form()
-                .param("isbn", "9780857520197")
-                .param("title", "Second Life")
+                .param("isbn", "9780857520198")
+                .param("title", "Second Life, second edition")
                 .param("author", "Watson, S. J.")
-                .param("published", "2015-02-12")
+                .param("published", "2016-01-01")
                 .param("translator", null)
                 .param("summary", "The sensational new psychological thriller from ... ")
                 .param("publisher-code", "08575");
@@ -178,12 +178,11 @@ public class BookResourceTest {
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
     @Test
-    public void newBookShouldReturn_CREATED() {
+    public void newBookWithPutShouldReturn_CREATED() {
 
         final Publisher publisher = new Publisher(DomainPopulator.CAPPELEN_DAMM, "Cappelen Damm");
         final Book book = Book
@@ -226,31 +225,7 @@ public class BookResourceTest {
                 .put(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String errorMessage = response.readEntity(String.class);
     }
-
-    @Test
-    public void newBookShouldReturn_CONFLICT() {
-        Response response = target
-                .path(BookResource.RESOURCE_PATH)
-                .path(ISBN_VREDENS_DRUER)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get();
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        Book existingBook = response.readEntity(Book.class);
-
-        Book duplicatedBook = Book.with(existingBook, false).build();
-
-        response = target
-                .path(BookResource.RESOURCE_PATH)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .put(Entity.entity(duplicatedBook, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
-    }
-
-
 
     @Test
     public void updateBookShouldReturn_OK() {
