@@ -48,8 +48,7 @@ public interface Repository {
 
     Query createNativeQuery(String sql, Map<String, Object> parameters);
 
-    <T> Query createNativeQuery(
-            String sql, Class<T> resultClass, Map<String, Object> parameters);
+    Query createNativeQuery(String sql, Class resultClass, Map<String, Object> parameters);
 
     Query createNativeQuery(
             String sql, String resultSetMapping, Map<String, Object> parameters);
