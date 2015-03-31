@@ -17,7 +17,7 @@
 
 
     <properties>
-        <eclipse.persistence.jpa.version>2.5.2</eclipse.persistence.jpa.version>
+        <eclipse.persistence.jpa.version>2.6.0</eclipse.persistence.jpa.version>
         <eclipse.javax.persistence.version>2.1.0</eclipse.javax.persistence.version>
         <guava.version>18.0</guava.version>
         <h2.version>1.4.185</h2.version>
@@ -380,6 +380,12 @@
                 <artifactId>org.eclipse.persistence.jpa</artifactId>
                 <version>${eclipse.persistence.jpa.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>org.eclipse.persistence.moxy</artifactId>
+                <version>${eclipse.persistence.jpa.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>javax.persistence</artifactId>
