@@ -8,8 +8,14 @@ import java.util.Date;
 public class DateAdapter {
     private Date date;
 
+    public DateAdapter() {}
+
     public DateAdapter(String date){
         this.date = getDateFromString(date);
+    }
+
+    public DateAdapter(Date date){
+        this.date = date;
     }
 
     public Date getDate(){

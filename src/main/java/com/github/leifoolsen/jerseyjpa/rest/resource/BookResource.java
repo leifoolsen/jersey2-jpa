@@ -149,6 +149,13 @@ public class BookResource {
     }
 
     @PUT
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response createOrUpdate(@BeanParam final BookDTO params) {
+
+        return Response.ok().build();
+    }
+
+    @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrUpdate(final Book book) {
 

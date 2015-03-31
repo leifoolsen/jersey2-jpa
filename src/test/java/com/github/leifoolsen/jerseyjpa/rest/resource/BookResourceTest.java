@@ -122,20 +122,20 @@ public class BookResourceTest {
 
     @Test
     public void newBookWithBeanParamShouldReturn_CREATED() {
-        Form form = new Form();
-        form.param("isbn", "9780297871934")
-                .param("title", "Accidence Will Happen : The Non-Pedantic Guide to English Usage")
-                .param("author", "Kamm, Oliver")
-                .param("published", "2015-02-12")
-                .param("translator", null)
-                .param("summary", "Are standards of English alright - or should that be all right? To knowingly " +
-                        "split an infinitive or not to? And what about ending a sentence with preposition, or for " +
-                        "that matter beginning one with 'and'? We learn language by instinct, but good English, " +
-                        "the pedants tell us, requires rules. Yet, as Oliver Kamm demonstrates, many of the purists' " +
-                        "prohibitions are bogus and can be cheerfully disregarded. ACCIDENCE WILL HAPPEN is an " +
-                        "authoritative and deeply reassuring guide to grammar, style and the linguistic conundrums " +
-                        "we all face.")
-                .param("publisher-code", "02978");
+        Form form = new Form()
+            .param("isbn", "9780297871934")
+            .param("title", "Accidence Will Happen : The Non-Pedantic Guide to English Usage")
+            .param("author", "Kamm, Oliver")
+            .param("published", "2015-02-12")
+            .param("translator", null)
+            .param("summary", "Are standards of English alright - or should that be all right? To knowingly " +
+                    "split an infinitive or not to? And what about ending a sentence with preposition, or for " +
+                    "that matter beginning one with 'and'? We learn language by instinct, but good English, " +
+                    "the pedants tell us, requires rules. Yet, as Oliver Kamm demonstrates, many of the purists' " +
+                    "prohibitions are bogus and can be cheerfully disregarded. ACCIDENCE WILL HAPPEN is an " +
+                    "authoritative and deeply reassuring guide to grammar, style and the linguistic conundrums " +
+                    "we all face.")
+            .param("publisher-code", "02978");
 
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
@@ -145,24 +145,42 @@ public class BookResourceTest {
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
-
     @Test
     public void newBookWithBeanParamMissingRequiredFieldShouldReturn_BAD_REQUEST() {
-        Form form = new Form();
-        form.param("isbn", "9780857520197")
-                .param("author", "Watson, S. J.")
-                .param("published", "2015-02-12")
-                .param("translator", null)
-                .param("summary", "The sensational new psychological thriller from ... ");
+        Form form = new Form()
+            .param("isbn", "9780857520197")
+            .param("author", "Watson, S. J.")
+            .param("published", "2015-02-12")
+            .param("translator", null)
+            .param("summary", "The sensational new psychological thriller from ... ");
 
         final Response response = target
-                .path(BookResource.RESOURCE_PATH)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+            .path(BookResource.RESOURCE_PATH)
+            .request(MediaType.APPLICATION_JSON_TYPE)
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void newBookShouldReturn_x() {
+        Form form = new Form()
+                .param("isbn", "9780857520197")
+                .param("title", "Second Life")
+                .param("author", "Watson, S. J.")
+                .param("published", "2015-02-12")
+                .param("translator", null)
+                .param("summary", "The sensational new psychological thriller from ... ")
+                .param("publisher-code", "08575");
+
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    }
 
     @Test
     public void newBookShouldReturn_CREATED() {
