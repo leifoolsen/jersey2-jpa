@@ -377,6 +377,14 @@ public class RepositoryJPA implements Repository {
     }
 
     @Override
+    public Query createNativeQuery(final String sql, final Map<String, Object> parameters)
+    {
+        final Query query = getEntityManager().createNativeQuery(sql);
+        addQueryParameters(query, parameters);
+        return query;
+    }
+
+    @Override
     public <T> Query createNativeQuery(
             final String sql, final Class<T> resultClass, final Map<String, Object> parameters)
     {
