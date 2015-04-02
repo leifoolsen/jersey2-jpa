@@ -6,5 +6,4 @@
 
     <entity class="com.github.leifoolsen.jerseyjpa.domain.Publisher" />
     <entity class="com.github.leifoolsen.jerseyjpa.domain.Book" />
-    <entity class="com.github.leifoolsen.jerseyjpa.domain.FeedTeller" />
 </entity-mappings>
