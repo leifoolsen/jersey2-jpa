@@ -2,7 +2,6 @@ package com.github.leifoolsen.jerseyjpa.rest.resource;
 
 import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
-import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,9 +32,6 @@ public class JaxbTest {
 
         // Create the client
         Client c = ClientBuilder.newClient();
-
-        // Client interceptor to deflate GZIP'ed content
-        c.register(GZIPReaderInterceptor.class);
 
         target = c.target(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH);
     }
