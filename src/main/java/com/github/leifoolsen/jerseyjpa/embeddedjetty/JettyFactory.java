@@ -39,7 +39,7 @@ public class JettyFactory {
         // Setup Threadpool
         QueuedThreadPool threadPool = new QueuedThreadPool();
         threadPool.setMinThreads(8);
-        threadPool.setMaxThreads(500);
+        threadPool.setMaxThreads(100);
 
 
         // The Server
