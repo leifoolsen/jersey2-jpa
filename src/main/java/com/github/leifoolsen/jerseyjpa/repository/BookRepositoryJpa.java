@@ -69,6 +69,15 @@ public class BookRepositoryJpa {
         return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
     }
 
+    public List<Book> findBooksBySearchTtype(
+            final String searchType, final String searchValue,
+            final Integer offset, final Integer limit) {
+
+        final String jpql = "select b from %s b where b." + searchType + " like :searchType order by b." + searchType;
+        final QueryParameter qp = QueryParameter.with("searchType", "%"+searchValue+"%");
+        return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), offset, limit);
+    }
+
     public Publisher findPublisherByCode(final String publisherCode) {
         final String jpql = "select p from %s p where p.code = :code";
         final QueryParameter qp = QueryParameter.with("code", publisherCode);

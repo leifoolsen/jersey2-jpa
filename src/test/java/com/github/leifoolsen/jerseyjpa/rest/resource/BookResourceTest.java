@@ -26,6 +26,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -276,10 +277,24 @@ public class BookResourceTest {
                 .get();
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
     }
 
 
+    @Test
+    public void foo() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/isbn")
+                .queryParam("q", "9788")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
+        assertThat(result, hasSize(greaterThan(0)));
+
+    }
 
     @Test
     public void pingShouldReturnPong() {

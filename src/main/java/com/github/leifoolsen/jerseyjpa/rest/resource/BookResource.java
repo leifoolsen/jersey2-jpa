@@ -10,7 +10,6 @@ import com.github.leifoolsen.jerseyjpa.rest.dto.BookDTO;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import com.google.common.base.MoreObjects;
-import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,15 +52,12 @@ public class BookResource {
     public BookResource(@Context @NotNull UriInfo uriInfo, @Context @NotNull ResourceContext resourceContext) {
         this.uriInfo = uriInfo;
         this.resourceContext = resourceContext;
-        logger.debug("Resource created");
+        logger.debug(this.getClass().getSimpleName() + " created");
     }
 
     @GET
     @Path("{isbn}")
-    public Book byIsbn(
-            @NotBlank
-            @Isbn
-            @PathParam("isbn") final String isbn) {
+    public Book byIsbn(@Isbn @PathParam("isbn") final String isbn) {
 
         final Book result = repository.findBookByISBN(isbn);
 
@@ -74,36 +70,6 @@ public class BookResource {
         }
         return result; // Response.Status.OK
         // return Response.Status.BAD_REQUEST if Bean validation fails
-    }
-
-    @GET
-    @Compress
-    public Response allBooks(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
-        if(offset != null) {
-            uriBuilder.queryParam("offset", offset);
-        }
-        if(limit != null) {
-            uriBuilder.queryParam("limit", limit);
-        }
-        final List<Book> books = repository.findBooks(offset, limit);
-
-
-        if(books.size()< 1) {
-            return Response
-                    .noContent()
-                    .location(uriBuilder.build())
-                    .build();
-        }
-
-        GenericEntity<List<Book>> entities = new GenericEntity<List<Book>>(books){};
-        UriBuilder linkBuilder = uriInfo.getRequestUriBuilder().clone();
-        return Response
-                .ok(entities)
-                .location(uriBuilder.build())
-                        //.link(linkBuilder.queryParam("offset", 10).queryParam("limit", limit).build(), "prev")
-                        //.link(linkBuilder.queryParam("offset", 20).queryParam("limit", limit).build(), "next")
-                .build();
     }
 
     @POST
@@ -205,6 +171,43 @@ public class BookResource {
             logger.debug("Book with isbn: '{}' deleted", isbn);
         }
         // void method returns Response.Status.NO_CONTENT
+    }
+
+
+    @GET
+    @Compress
+    public Response allBooks(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
+        if(offset != null) {
+            uriBuilder.queryParam("offset", offset);
+        }
+        if(limit != null) {
+            uriBuilder.queryParam("limit", limit);
+        }
+        final List<Book> books = repository.findBooks(offset, limit);
+
+
+        if(books.size()< 1) {
+            return Response
+                    .noContent()
+                    .location(uriBuilder.build())
+                    .build();
+        }
+
+        GenericEntity<List<Book>> entities = new GenericEntity<List<Book>>(books){};
+        UriBuilder linkBuilder = uriInfo.getRequestUriBuilder().clone();
+        return Response
+                .ok(entities)
+                .location(uriBuilder.build())
+                        //.link(linkBuilder.queryParam("offset", 10).queryParam("limit", limit).build(), "prev")
+                        //.link(linkBuilder.queryParam("offset", 20).queryParam("limit", limit).build(), "next")
+                .build();
+    }
+
+
+    @Path("search/{searchType}")
+    public SearchResource search() {
+        return resourceContext.getResource(SearchResource.class);
     }
 
 
