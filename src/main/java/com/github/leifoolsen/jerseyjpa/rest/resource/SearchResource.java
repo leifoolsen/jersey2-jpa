@@ -48,7 +48,11 @@ public class SearchResource {
 
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
 
-        List<Book> books = repository.findBooksBySearchTtype(searchType, searchValue, offset, limit);
+        if(searchValue != null) { uriBuilder.queryParam("q", searchValue); }
+        if(offset      != null) { uriBuilder.queryParam("offset", offset); }
+        if(limit       != null) { uriBuilder.queryParam("limit", limit); }
+
+        List<Book> books = repository.findBooksBySearchType(SearchType.Type.get(searchType), searchValue, offset, limit);
 
         if(books.size() < 1) {
             return Response

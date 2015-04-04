@@ -1,6 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.rest.resource;
 
 import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
+import com.github.leifoolsen.jerseyjpa.constraint.SearchType;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.exception.ApplicationException;
@@ -28,12 +29,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.util.List;
 
 @Singleton
 @Path(BookResource.RESOURCE_PATH)
@@ -177,33 +176,9 @@ public class BookResource {
     @GET
     @Compress
     public Response allBooks(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
-        if(offset != null) {
-            uriBuilder.queryParam("offset", offset);
-        }
-        if(limit != null) {
-            uriBuilder.queryParam("limit", limit);
-        }
-        final List<Book> books = repository.findBooks(offset, limit);
-
-
-        if(books.size()< 1) {
-            return Response
-                    .noContent()
-                    .location(uriBuilder.build())
-                    .build();
-        }
-
-        GenericEntity<List<Book>> entities = new GenericEntity<List<Book>>(books){};
-        UriBuilder linkBuilder = uriInfo.getRequestUriBuilder().clone();
-        return Response
-                .ok(entities)
-                .location(uriBuilder.build())
-                        //.link(linkBuilder.queryParam("offset", 10).queryParam("limit", limit).build(), "prev")
-                        //.link(linkBuilder.queryParam("offset", 20).queryParam("limit", limit).build(), "next")
-                .build();
+        // Calling SearchResource directly is a hack, I think, but don't know how to do it otherwise
+        return resourceContext.getResource(SearchResource.class).allBooks(SearchType.Type.ANY.type(), null, offset, limit);
     }
-
 
     @Path("search/{searchType}")
     public SearchResource search() {

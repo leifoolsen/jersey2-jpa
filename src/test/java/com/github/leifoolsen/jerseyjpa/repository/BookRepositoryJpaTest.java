@@ -1,5 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.repository;
 
+import com.github.leifoolsen.jerseyjpa.constraint.SearchType;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.util.DatabasePopulator;
@@ -155,41 +156,6 @@ public class BookRepositoryJpaTest {
     }
 
     @Test
-    public void shouldFindMoreThanTwoBooksByAuthorErlendLoe() {
-        final String author = "Loe, Erlend";
-        List<Book> books = bookRepository.findBooksByAuthor(author);
-        logger.debug("Found {} books by author '{}'", books.size(), author);
-        assertThat(books, hasSize(greaterThan(2)));
-    }
-
-    @Test
-    public void shouldFindMoreThanOneBookByPublisherPicador() {
-        final Publisher publisher = bookRepository.findPublisherByCode(DomainPopulator.PICADOR);
-        assertNotNull(publisher);
-        final List<Book> books = bookRepository.findBooksByPublisher(publisher);
-        logger.debug("Found {} books by publisher '{}'", books.size(), publisher.getName());
-        assertThat(books, hasSize(greaterThan(1)));
-    }
-
-    @Test
-    public void shouldFindFourBooks() {
-        final List<Book> books = bookRepository.findBooks(2, 4);
-        assertThat(books, hasSize(4));
-    }
-
-    @Test
-    public void shouldFindFivePublishers() {
-        final List<Publisher> publishers = bookRepository.findPublishers(0, 5);
-        assertThat(publishers, hasSize(5));
-    }
-
-    @Test
-    public void shouldFindPublishersWithNameCappelen() {
-        final List<Publisher> publishers = bookRepository.findPublishersByName("Cappelen");
-        assertThat(publishers, hasSize(greaterThan(1)));
-    }
-
-    @Test
     public void createNewBookAndUpdateExistingBook() {
 
         final Publisher publisher = bookRepository.findPublisherByCode(DomainPopulator.WEIDENFELD);
@@ -223,5 +189,55 @@ public class BookRepositoryJpaTest {
 
         b = bookRepository.createOrUpdateBook(changedBook);
         assertThat(b.getVersion(), greaterThan(0L));
+    }
+
+    @Test
+    public void shouldFindFivePublishers() {
+        final List<Publisher> publishers = bookRepository.findPublishers(0, 5);
+        assertThat(publishers, hasSize(5));
+    }
+
+    @Test
+    public void shouldFindPublishersWithNameCappelen() {
+        final List<Publisher> publishers = bookRepository.findPublishersByName("Cappelen");
+        assertThat(publishers, hasSize(greaterThan(1)));
+    }
+
+
+    @Test
+    public void shouldFindMoreThanTwoBooksByAuthorErlendLoe() {
+        final String author = "Loe, Erlend";
+        List<Book> books = bookRepository.findBooksBySearchType(SearchType.Type.AUTHOR, author, null, null);
+        logger.debug("Found {} books by author '{}'", books.size(), author);
+        assertThat(books, hasSize(greaterThan(2)));
+    }
+
+    @Test
+    public void shouldFindMoreThanOneBookByPublisherPicador() {
+        final List<Book> books = bookRepository.findBooksBySearchType(
+                SearchType.Type.PUBLISHER_NAME, "picador", null, null);
+        logger.debug("Found {} books by publisher '{}'", books.size(), "picador");
+        assertThat(books, hasSize(greaterThan(1)));
+    }
+
+    @Test
+    public void shouldFindAnyBookResultLimitedToFourBooks() {
+        final List<Book> books = bookRepository.findBooksBySearchType(
+                SearchType.Type.ANY, null, 2, 4);
+        assertThat(books, hasSize(4));
+    }
+
+    @Test
+    public void shouldFindAnyBookWithTextHawking() {
+        final List<Book> books = bookRepository.findBooksBySearchType(
+                SearchType.Type.ANY, "hawking", null, null);
+        assertThat(books, hasSize(greaterThan(1)));
+
+    }
+
+    @Test
+    public void shouldFindFourBooks() {
+        final List<Book> books = bookRepository.findBooks(2, 4);
+        assertThat(books, hasSize(4));
     }
 }

@@ -106,22 +106,6 @@ public class BookResourceTest {
     }
 
     @Test
-    public void getFiveBooksShouldReturn_OK() {
-        final Response response = target
-                .path(BookResource.RESOURCE_PATH)
-                .queryParam("offset", 0)
-                .queryParam("limit", 5)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get();
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {
-        });
-        assertThat(result, hasSize(5));
-    }
-
-    @Test
     public void newBookWithFormPostShouldReturn_CREATED() {
         Form form = new Form()
             .param("isbn", "9780297871934")
@@ -281,7 +265,38 @@ public class BookResourceTest {
 
 
     @Test
-    public void foo() {
+    public void allBooksLimitToFiveItemsShouldReturn_OK() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .queryParam("offset", 0)
+                .queryParam("limit", 5)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
+        assertThat(result, hasSize(5));
+    }
+
+    @Test
+    public void searchAnyBookLimitToFiveItemsShouldReturn_OK() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/any")
+                .queryParam("offset", 0)
+                .queryParam("limit", 5)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {} );
+        assertThat(result, hasSize(5));
+    }
+
+    @Test
+    public void searchByIsbnShouldReturn_OK() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/isbn")
@@ -291,9 +306,53 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {} );
+        assertThat(result, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void searchByPublisherNameShouldReturn_OK() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/publisher.name")
+                .queryParam("q", "gyldendal")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {} );
+        assertThat(result, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void searchByAuthorShouldReturn_OK() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/author")
+                .queryParam("q", "Loe")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
         final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
         assertThat(result, hasSize(greaterThan(0)));
+    }
 
+    @Test
+    public void searchAnyBookWithTextHawkingShouldReturn_OK() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/any")
+                .queryParam("q", "hawking")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
+        assertThat(result, hasSize(greaterThan(1)));
     }
 
     @Test

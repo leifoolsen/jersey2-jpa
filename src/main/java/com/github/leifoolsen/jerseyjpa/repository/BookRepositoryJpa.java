@@ -1,16 +1,20 @@
 package com.github.leifoolsen.jerseyjpa.repository;
 
+import com.github.leifoolsen.jerseyjpa.constraint.SearchType;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.util.QueryParameter;
 import com.github.leifoolsen.jerseyjpa.util.Repository;
 import com.github.leifoolsen.jerseyjpa.util.RepositoryJPA;
+import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,25 +61,36 @@ public class BookRepositoryJpa {
         return RepositoryJPA.findFirstWithQuery(createQuery(jpql, Book.class, qp.parameters()));
     }
 
-    public List<Book> findBooksByPublisher(final Publisher publisher) {
-        final String jpql = "select b from %s b where b.publisher = :publisher";
-        final QueryParameter qp = QueryParameter.with("publisher", publisher);
-        return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
-    }
+    public List<Book> findBooksBySearchType(
+            final SearchType.Type searchType, final String searchValue, final Integer offset, final Integer limit) {
 
-    public List<Book> findBooksByAuthor(final String author) {
-        final String jpql = "select b from %s b where b.author like :author";
-        final QueryParameter qp = QueryParameter.with("author", author+"%");
-        return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), null, null);
-    }
+        String jpql = "select b from %s b ";
+        QueryParameter qp = null;
 
-    public List<Book> findBooksBySearchTtype(
-            final String searchType, final String searchValue,
-            final Integer offset, final Integer limit) {
+        final String sv = blankToNull(searchValue);
 
-        final String jpql = "select b from %s b where b." + searchType + " like :searchType order by b." + searchType;
-        final QueryParameter qp = QueryParameter.with("searchType", "%"+searchValue+"%");
-        return RepositoryJPA.findWithQuery(createQuery(jpql, Book.class, qp.parameters()), offset, limit);
+        if(SearchType.Type.ANY == searchType && sv != null) {
+            jpql += "where ";
+            List<String> any = new ArrayList<>();
+            for (SearchType.Type t : SearchType.Type.values()) {
+                if(SearchType.Type.ANY != t ) {
+                    any.add("LOWER(b." + t.type() + ") like :searchType ");
+                }
+            }
+            jpql += Joiner.on("or ").join(any);
+            qp = QueryParameter.with("searchType", "%" + sv.toLowerCase() + "%");
+        }
+        else if(sv != null) {
+            jpql += "where LOWER(b." + searchType.type() + ") like :searchType ";
+            qp = QueryParameter.with("searchType", "%" + sv.toLowerCase() + "%");
+        }
+
+        if(SearchType.Type.ANY != searchType) {
+            jpql += "order by b." + searchType.type();
+        }
+
+        return RepositoryJPA.findWithQuery(
+                createQuery(jpql, Book.class, (qp != null ? qp.parameters() : null)), offset, limit);
     }
 
     public Publisher findPublisherByCode(final String publisherCode) {
@@ -99,4 +114,10 @@ public class BookRepositoryJpa {
         final String jpql = String.format(queryString, entityName);
         return repository.createQuery(jpql, entityClass, parameters);
     }
+
+    private static String blankToNull(final String value) {
+        String s = MoreObjects.firstNonNull(value, "").trim();
+        return s.length() > 0 ? s : null;
+    }
+
 }

@@ -73,7 +73,7 @@ public class DomainPopulator {
                     .summary("Boka forteller om livet til vitenskapsmannen Stephen Hawking. Boka gir ett innblikk i både " +
                             "privatlivet til Hawking, og i hans karriere som forsker innenfor teoretisk fysikk og " +
                             "astrofysikk. Den setter vitenskapen inn i en menneskelig sammenheng, og viser hvordan " +
-                            "vitenskap og liv er uløselig knytta sammen for Hawking. Har register.")
+                            "vitenskap og liv er uløselig knytta sammen for Hawking.")
                     .build(),
 
             Book.with("9781118175392")
