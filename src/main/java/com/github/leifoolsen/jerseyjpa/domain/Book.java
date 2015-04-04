@@ -1,6 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.domain;
 
 import com.google.common.base.MoreObjects;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,16 +32,16 @@ public class Book {
     @Version
     private Long version;
 
-    @NotNull
-    @Pattern(regexp = "[0-9]+", message = "The ISBN must be a numeric value")
-    @Size(min=13, max=13, message = "ISBN must be a numeric with excact 13 digits")
+    @NotBlank
+    @Size(min=13, max=13, message = "{excact.n.digits}")
+    @Pattern(regexp = "[0-9]+", message = "{book.isbn.notvalid}")
     @Column(length = 13, unique = true)
     private String isbn;
     
-    @NotNull
+    @NotBlank
     private String title;
     
-    @NotNull
+    @NotBlank
     private String author;
 
     @Temporal(TemporalType.DATE)

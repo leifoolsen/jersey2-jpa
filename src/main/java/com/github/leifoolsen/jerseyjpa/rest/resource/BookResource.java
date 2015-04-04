@@ -9,6 +9,7 @@ import com.github.leifoolsen.jerseyjpa.rest.dto.BookDTO;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import com.google.common.base.MoreObjects;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -47,19 +49,20 @@ public class BookResource {
     private BookRepositoryJpa repository = new BookRepositoryJpa(connection);
 
     private UriInfo uriInfo; // actual uri info provided by parent resource (threadsafe)
+    private ResourceContext resourceContext;
 
-    public BookResource(@Context UriInfo uriInfo) {
+    public BookResource(@Context @NotNull UriInfo uriInfo, @Context @NotNull ResourceContext resourceContext) {
         this.uriInfo = uriInfo;
+        this.resourceContext = resourceContext;
         logger.debug("Resource created");
     }
-
 
     @GET
     @Path("{isbn}")
     public Book byIsbn(
-            @NotNull
-            @Size(min = 13, max = 13)
-            @Pattern(regexp = "\\d+", message = "ISBN must be a valid number")
+            @NotBlank
+            @Size(min = 13, max = 13, message = "{excact.n.digits}")
+            @Pattern(regexp = "\\d+", message = "{book.isbn.notvalid}")  // TODO: Create ISBN validator
             @PathParam("isbn") final String isbn) {
 
         final Book result = repository.findBookByISBN(isbn);
@@ -71,7 +74,7 @@ public class BookResource {
                             .build()
             );
         }
-        return result; // ==>  Response.Status.OK
+        return result; // Response.Status.OK
         // return Response.Status.BAD_REQUEST if Bean validation fails
     }
 
@@ -149,6 +152,12 @@ public class BookResource {
     }
 
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createOrUpdate(final Book book) {
+        return createOrUpdate(new BookDTO(book));
+    }
+
+    @PUT
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createOrUpdate(@BeanParam final BookDTO params) {
 
@@ -189,15 +198,9 @@ public class BookResource {
         return responseBuilder.build();
     }
 
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrUpdate(final Book book) {
-        return createOrUpdate(new BookDTO(book));
-    }
-
     @DELETE
     @Path("{isbn}")
-    public void delete(@PathParam("isbn") final String isbn) {
+    public void delete(@PathParam("isbn") @NotBlank final String isbn) {
         Book book = repository.findBookByISBN(isbn);
         if(book != null) {
             repository.deleteBook(book);

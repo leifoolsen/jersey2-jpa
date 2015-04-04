@@ -1,12 +1,14 @@
 package com.github.leifoolsen.jerseyjpa.domain;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,8 +27,9 @@ public class Publisher {
     @Version
     private Long version;
 
-    @NotNull
-    @Size(min=5, max=5)
+    @NotBlank
+    @Size(min=5, max=5, message = "{excact.n.digits}")
+    @Pattern(regexp = "[0-9]+", message = "{publisher.code.notvalid}")
     @Column(length = 5, unique = true)
     private String code;
 

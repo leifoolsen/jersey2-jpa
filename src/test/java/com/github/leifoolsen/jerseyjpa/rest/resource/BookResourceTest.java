@@ -295,15 +295,4 @@ public class BookResourceTest {
         assertEquals(ping, "Pong!");
     }
 
-    /*
-    @Test
-    public void getApplicationWadl() throws Exception {
-        final Response response = target
-                .path("application.wadl")
-                .request(MediaType.APPLICATION_XML)
-                .get();
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getResponseStatusCode());
-    }
-    */
 }
