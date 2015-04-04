@@ -1,5 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.domain;
 
+import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
 import com.google.common.base.MoreObjects;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -13,8 +14,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,9 +31,7 @@ public class Book {
     @Version
     private Long version;
 
-    @NotBlank
-    @Size(min=13, max=13, message = "{excact.n.digits}")
-    @Pattern(regexp = "[0-9]+", message = "{book.isbn.notvalid}")
+    @Isbn
     @Column(length = 13, unique = true)
     private String isbn;
     

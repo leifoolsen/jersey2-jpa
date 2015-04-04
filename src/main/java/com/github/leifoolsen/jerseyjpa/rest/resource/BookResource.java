@@ -1,5 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.rest.resource;
 
+import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.exception.ApplicationException;
@@ -15,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -61,8 +60,7 @@ public class BookResource {
     @Path("{isbn}")
     public Book byIsbn(
             @NotBlank
-            @Size(min = 13, max = 13, message = "{excact.n.digits}")
-            @Pattern(regexp = "\\d+", message = "{book.isbn.notvalid}")  // TODO: Create ISBN validator
+            @Isbn
             @PathParam("isbn") final String isbn) {
 
         final Book result = repository.findBookByISBN(isbn);
@@ -200,7 +198,7 @@ public class BookResource {
 
     @DELETE
     @Path("{isbn}")
-    public void delete(@PathParam("isbn") @NotBlank final String isbn) {
+    public void delete(@PathParam("isbn") @Isbn final String isbn) {
         Book book = repository.findBookByISBN(isbn);
         if(book != null) {
             repository.deleteBook(book);
