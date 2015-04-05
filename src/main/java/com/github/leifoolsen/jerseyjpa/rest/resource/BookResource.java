@@ -10,7 +10,7 @@ import com.github.leifoolsen.jerseyjpa.rest.dto.BookDTO;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.util.DatabaseConnection;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
-import com.google.common.base.MoreObjects;
+import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class BookResource {
         Response.ResponseBuilder responseBuilder;
 
         Publisher publisher = null;
-        String p = blankToNull(params.publisherCode);
+        String p = StringUtil.blankToNull(params.publisherCode);
         if(p != null) {
             publisher = repository.findPublisherByCode(params.publisherCode);
 
@@ -111,7 +111,7 @@ public class BookResource {
         Response.ResponseBuilder responseBuilder;
 
         Publisher publisher = null;
-        String p = blankToNull(params.publisherCode);
+        String p = StringUtil.blankToNull(params.publisherCode);
         if(p != null) {
             publisher = repository.findPublisherByCode(params.publisherCode);
 
@@ -192,11 +192,4 @@ public class BookResource {
     public String ping() {
         return "Pong!"; // --> Response.Status.OK
     }
-
-
-    private static String blankToNull(final String value) {
-        String s = MoreObjects.firstNonNull(value, "").trim();
-        return s.length() > 0 ? s : null;
-    }
-
 }

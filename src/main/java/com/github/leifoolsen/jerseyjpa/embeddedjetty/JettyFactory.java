@@ -1,7 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.embeddedjetty;
 
+import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.plus.webapp.EnvConfiguration;
 import org.eclipse.jetty.plus.webapp.PlusConfiguration;
@@ -26,7 +26,7 @@ public class JettyFactory {
     private int port = 8080;
 
     public JettyFactory extraClasspath(final String extraClasspath) {
-        this.extraClasspath = blankToNull(extraClasspath);
+        this.extraClasspath = StringUtil.blankToNull(extraClasspath);
         return this;
     }
     
@@ -112,11 +112,6 @@ public class JettyFactory {
         server.setHandler(webapp);
 
         return server;
-    }
-
-    private static String blankToNull(final String value) {
-        String s = MoreObjects.firstNonNull(value, "").trim();
-        return s.length() > 0 ? s : null;
     }
 
     /**

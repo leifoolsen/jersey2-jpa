@@ -1,7 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.domain;
 
 import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
-import com.google.common.base.MoreObjects;
+import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
@@ -156,12 +156,8 @@ public class Book {
         private String summary;
         private Publisher publisher;
 
-        private static String blankToNull(final String value) {
-            String s = MoreObjects.firstNonNull(value, "").trim();
-            return s.length() > 0 ? s : null;
-        }
         private Builder(final String isbn) {
-            this.isbn = blankToNull(isbn);
+            this.isbn = StringUtil.blankToNull(isbn);
         }
         public Builder id(final String id) {
             this.id = id;
@@ -172,11 +168,11 @@ public class Book {
             return this;
         }
         public Builder title(final String title) {
-            this.title = blankToNull(title);
+            this.title = StringUtil.blankToNull(title);
             return this;
         }
         public Builder author(final String author) {
-            this.author = blankToNull(author);
+            this.author = StringUtil.blankToNull(author);
             return this;
         }
         public Builder published(final Date published) {
@@ -184,11 +180,11 @@ public class Book {
             return this;
         }
         public Builder translator(final String translator) {
-            this.translator = blankToNull(translator);
+            this.translator = StringUtil.blankToNull(translator);
             return this;
         }
         public Builder summary(final String summary) {
-            this.summary = blankToNull(summary);
+            this.summary = StringUtil.blankToNull(summary);
             return this;
         }
         public Builder publisher(final Publisher publisher) {

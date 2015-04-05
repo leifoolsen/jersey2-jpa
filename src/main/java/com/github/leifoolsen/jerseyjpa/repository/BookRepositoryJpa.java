@@ -6,8 +6,8 @@ import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.util.QueryParameter;
 import com.github.leifoolsen.jerseyjpa.util.Repository;
 import com.github.leifoolsen.jerseyjpa.util.RepositoryJPA;
+import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class BookRepositoryJpa {
         String jpql = "select b from %s b ";
         QueryParameter qp = null;
 
-        final String sv = blankToNull(searchValue);
+        final String sv = StringUtil.blankToNull(searchValue);
 
         if(SearchType.Type.ANY == searchType && sv != null) {
             jpql += "where ";
@@ -114,10 +114,4 @@ public class BookRepositoryJpa {
         final String jpql = String.format(queryString, entityName);
         return repository.createQuery(jpql, entityClass, parameters);
     }
-
-    private static String blankToNull(final String value) {
-        String s = MoreObjects.firstNonNull(value, "").trim();
-        return s.length() > 0 ? s : null;
-    }
-
 }
