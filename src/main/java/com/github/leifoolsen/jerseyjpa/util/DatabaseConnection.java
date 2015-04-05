@@ -1,8 +1,7 @@
-package com.github.leifoolsen.jerseyjpa.repository;
+package com.github.leifoolsen.jerseyjpa.util;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
-import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 
 import java.util.Arrays;
 import java.util.Properties;

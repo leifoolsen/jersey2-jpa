@@ -1,4 +1,4 @@
-package com.github.leifoolsen.jerseyjpa.repository;
+package com.github.leifoolsen.jerseyjpa.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

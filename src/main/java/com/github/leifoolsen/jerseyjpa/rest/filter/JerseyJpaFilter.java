@@ -1,6 +1,6 @@
 package com.github.leifoolsen.jerseyjpa.rest.filter;
 
-import com.github.leifoolsen.jerseyjpa.repository.DatabaseConnection;
+import com.github.leifoolsen.jerseyjpa.util.DatabaseConnection;
 import com.github.leifoolsen.jerseyjpa.util.DatabasePopulator;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import org.slf4j.Logger;
