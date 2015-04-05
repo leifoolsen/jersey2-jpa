@@ -54,7 +54,7 @@ public class BookResourceTest {
         // Create the client
         Client c = ClientBuilder.newClient();
 
-        // Client interceptor to deflate GZIP'ed content
+        // Client interceptor to deflate GZIP'ed content on client side
         c.register(GZIPReaderInterceptor.class);
 
         target = c.target(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH);

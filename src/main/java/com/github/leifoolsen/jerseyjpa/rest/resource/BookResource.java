@@ -54,23 +54,6 @@ public class BookResource {
         logger.debug(this.getClass().getSimpleName() + " created");
     }
 
-    @GET
-    @Path("{isbn}")
-    public Book byIsbn(@Isbn @PathParam("isbn") final String isbn) {
-
-        final Book result = repository.findBookByISBN(isbn);
-
-        if (result == null) {
-            throw new WebApplicationException("Book with isbn: '"+ isbn + "' was not found",
-                    Response.status(Response.Status.NOT_FOUND)
-                            .location(uriInfo.getAbsolutePath())
-                            .build()
-            );
-        }
-        return result; // Response.Status.OK
-        // return Response.Status.BAD_REQUEST if Bean validation fails
-    }
-
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response create(@BeanParam final BookDTO params) {
@@ -172,6 +155,23 @@ public class BookResource {
         // void method returns Response.Status.NO_CONTENT
     }
 
+
+    @GET
+    @Path("{isbn}")
+    public Book byIsbn(@Isbn @PathParam("isbn") final String isbn) {
+
+        final Book result = repository.findBookByISBN(isbn);
+
+        if (result == null) {
+            throw new WebApplicationException("Book with isbn: '"+ isbn + "' was not found",
+                    Response.status(Response.Status.NOT_FOUND)
+                            .location(uriInfo.getAbsolutePath())
+                            .build()
+            );
+        }
+        return result; // Response.Status.OK
+        // return Response.Status.BAD_REQUEST if Bean validation fails
+    }
 
     @GET
     @Compress
