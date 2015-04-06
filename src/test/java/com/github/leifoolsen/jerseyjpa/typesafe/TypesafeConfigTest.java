@@ -9,6 +9,16 @@ import org.slf4j.LoggerFactory;
 public class TypesafeConfigTest {
     private static final Logger logger = LoggerFactory.getLogger(TypesafeConfigTest.class);
 
+    /*
+     *  See: https://github.com/typesafehub/config
+     *  See: https://marcinkubala.wordpress.com/2013/10/09/typesafe-config-hocon/
+     *  See: http://blog.michaelhamrah.com/2014/02/leveraging-typesafes-config-library-across-environments/
+     *  See: https://marcinkubala.wordpress.com/2013/10/09/typesafe-config-hocon/
+     *  See: http://javaeeconfig.blogspot.no/2014/08/overview-of-existing-configuration.html
+     *  See: http://vastdevblog.vast.com/blog/2012/06/16/creating-named-guice-bindings-for-typesafe-config-properties/
+     *
+     */
+
     @Test
     public void typeSafeConfigTake1() {
 

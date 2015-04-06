@@ -53,7 +53,7 @@ public class RepositoryJPA implements Repository {
             em.persist(entity);
             em.flush();
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             if(!transactionAlreadyStarted) {
                 em.getTransaction().rollback();
             }
@@ -79,7 +79,7 @@ public class RepositoryJPA implements Repository {
                 em.flush();
                 result.add(entity);
             }
-            catch (Exception e) {
+            catch (RuntimeException e) {
                 if(!transactionAlreadyStarted) {
                     em.getTransaction().rollback();
                 }
@@ -104,7 +104,7 @@ public class RepositoryJPA implements Repository {
             em.flush();
             return result;
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             if(!transactionAlreadyStarted) {
                 em.getTransaction().rollback();
             }
@@ -132,7 +132,7 @@ public class RepositoryJPA implements Repository {
                 em.flush();
                 result.add(e);
             }
-            catch (Exception e) {
+            catch (RuntimeException e) {
                 if(!transactionAlreadyStarted) {
                     em.getTransaction().rollback();
                 }
@@ -170,7 +170,7 @@ public class RepositoryJPA implements Repository {
             if(logger.isDebugEnabled()) logger.debug(logMsg, entityName(entity.getClass()), id);
             return result;
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             if(!transactionAlreadyStarted) {
                 em.getTransaction().rollback();
             }
@@ -206,7 +206,7 @@ public class RepositoryJPA implements Repository {
                 em.flush();
                 result.add(e);
             }
-            catch (Exception e) {
+            catch (RuntimeException e) {
                 if(!transactionAlreadyStarted) {
                     em.getTransaction().rollback();
                 }
@@ -230,7 +230,7 @@ public class RepositoryJPA implements Repository {
             em.remove(entity);
             em.flush();
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             if(!transactionAlreadyStarted) {
                 em.getTransaction().rollback();
             }
@@ -258,8 +258,9 @@ public class RepositoryJPA implements Repository {
                 em.flush();
             }
             catch (EntityNotFoundException e) {
+                // NOOP
             }
-            catch (Exception e) {
+            catch (RuntimeException e) {
                 if (!transactionAlreadyStarted) {
                     em.getTransaction().rollback();
                 }
@@ -289,7 +290,7 @@ public class RepositoryJPA implements Repository {
                 em.remove(entity);
                 em.flush();
             }
-            catch (Exception e) {
+            catch (RuntimeException e) {
                 if(!transactionAlreadyStarted) {
                     em.getTransaction().rollback();
                 }
