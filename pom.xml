@@ -80,6 +80,12 @@
             <artifactId>jersey-bean-validation</artifactId>
         </dependency>
 
+        <!-- Typesafe configuration for JVM languages -->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -342,7 +348,7 @@
             -->
 
 
-            <!-- Configuration library, see: https://github.com/typesafehub/config/ -->
+            <!-- Typesafe configuration for JVM languages, see: https://github.com/typesafehub/config/ -->
             <dependency>
                 <groupId>com.typesafe</groupId>
                 <artifactId>config</artifactId>

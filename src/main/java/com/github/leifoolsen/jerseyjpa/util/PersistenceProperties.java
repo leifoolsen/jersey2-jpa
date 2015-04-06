@@ -53,6 +53,7 @@ public class PersistenceProperties {
             properties.put("eclipselink.persistence-context.close-on-commit", "true");
             properties.put("eclipselink.persistence-context.persist-on-commit", "false");
             properties.put("eclipselink.flush-clear.cache", "drop");
+            //properties.put("eclipselink.logging.logger", "JavaLogger");
 
             // Eclipselink can not load entity classes dynamically.
             // Classes must be added to META-INF/eclipselink-orm.xml by hand :-(

@@ -1,8 +1,7 @@
-package com.github.leifoolsen.jerseyjpa;
+package com.github.leifoolsen.jerseyjpa.util;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
-import com.github.leifoolsen.jerseyjpa.util.JaxbHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
