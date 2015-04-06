@@ -58,7 +58,7 @@ public class DomainPopulator {
                     .title("Travelling to Infinity: The True Story")
                     .author("Hawking, Jane")
                     .publisher(publishers.get(ALMA_BOOKS))
-                    .published(new GregorianCalendar(2014, 12, 18).getTime())
+                    .published(new GregorianCalendar(2014, 11, 18).getTime())
                     .summary("Soon to be a major motion picture starring Eddie Redmayne as Hawking and Felicity " +
                             "Jones as his wife Jane. It chronicles their relationship, from his early development " +
                             "of ALS to his success in physics.")
@@ -68,7 +68,7 @@ public class DomainPopulator {
                     .title("Superstjernen Stephen Hawking: biografi")
                     .author("Gribbin, John; White, Michael")
                     .publisher(publishers.get(DAMM))
-                    .published(new GregorianCalendar(2014, 1, 1).getTime())
+                    .published(new GregorianCalendar(2014, 0, 1).getTime())
                     .translator("Larsen, Anne Kirsti Solheim; Larsen, Finn B.")
                     .summary("Boka forteller om livet til vitenskapsmannen Stephen Hawking. Boka gir ett innblikk i både " +
                             "privatlivet til Hawking, og i hans karriere som forsker innenfor teoretisk fysikk og " +
@@ -80,7 +80,7 @@ public class DomainPopulator {
                     .title("Alone in the Universe: Why Our Planet Is Unique")
                     .author("Gribbin, John")
                     .publisher(publishers.get(TURNER))
-                    .published(new GregorianCalendar(2011, 1, 1).getTime())
+                    .published(new GregorianCalendar(2011, 0, 1).getTime())
                     .summary("The acclaimed author of In Search of Schrodinger's Cat searches for life on other " +
                             "planets. Are we alone in the universe? Surely amidst the immensity of the cosmos there must " +
                             "be other intelligent life out there. Don't be so sure, says John Gribbin, one of today's " +
@@ -102,7 +102,7 @@ public class DomainPopulator {
                     .title("Guide to Middle Earth: Tolkien and The Lord of the Rings")
                     .author("Duriez, Colin")
                     .publisher(publishers.get(HISTORY_PRESS))
-                    .published(new GregorianCalendar(2013, 1, 1).getTime())
+                    .published(new GregorianCalendar(2013, 0, 1).getTime())
                     .summary("An illuminating guide to Middle-earth and the man who created it.")
                     .build(),
 
@@ -110,7 +110,7 @@ public class DomainPopulator {
                     .title("Verdens duer")
                     .author("Steinbeck, John")
                     .publisher(publishers.get(PAX))
-                    .published(new GregorianCalendar(1998, 1, 1).getTime())
+                    .published(new GregorianCalendar(1998, 0, 1).getTime())
                     .translator("Omre, Arthur")
                     .summary("I 1939 (på norsk i 1940) kom denne romanen som slo fast at Steinbeck var en av mestrene " +
                             "i moderne amerikansk prosadiktning. Romanen står i dag som et minnesmerke over " +
@@ -124,7 +124,7 @@ public class DomainPopulator {
                     .title("Gravrøys")
                     .author("Theorin, Johan")
                     .publisher(publishers.get(GYLDENDAL))
-                    .published(new GregorianCalendar(2014, 1, 1).getTime())
+                    .published(new GregorianCalendar(2014, 0, 1).getTime())
                     .translator("Bolstad, Kari")
                     .summary("I Johan Theorins fjerde bok fra Öland forenes fortid og nåtid i en særdeles " +
                             "velskrevet og ubehagelig krim. Det er midtsommer på Öland. Tusenvis av turister er " +
@@ -143,7 +143,7 @@ public class DomainPopulator {
                     .title("Kuppet: på innsiden av Norges mektigste mafiafamilie")
                     .author("Aass, Hans Petter; Widerøe, Rolf J.")
                     .publisher(publishers.get(GYLDENDAL))
-                    .published(new GregorianCalendar(2015, 1, 1).getTime())
+                    .published(new GregorianCalendar(2015, 0, 1).getTime())
                     .summary("En ny, knallsterk dokumentar fra forfatterne av bestselgerne Dødsranet og Krigshelten. " +
                             "Tema: Nordea-kuppet, norgeshistoriens frekkeste bedrageri. 20. juli 2010 tropper en 49 " +
                             "år gammel hjelpepleier opp i Nordeas filialer på Tveita i Oslo. Utkledd som " +
@@ -162,7 +162,7 @@ public class DomainPopulator {
                     .title("Gyldendals store fugleguide: Europas og middelhavsområdets fugler i felt")
                     .author("Svensson, Lars")
                     .publisher(publishers.get(GYLDENDAL))
-                    .published(new GregorianCalendar(2011, 1, 1).getTime())
+                    .published(new GregorianCalendar(2011, 0, 1).getTime())
                     .translator("Sandvik, Jostein; Syvertsen, Per Ole")
                     .summary("Verdens beste fuglebok i ny feltutgave! Gyldendals store fugleguide er markedets mest " +
                             "omfattende felthåndbok og anses som et normgivende standardverk for fuglehåndbøker. " +
@@ -181,7 +181,7 @@ public class DomainPopulator {
                     .title("Alan Turing: The Enigma")
                     .author("Hodges, Andrew")
                     .publisher(publishers.get(VINTAGE_UK))
-                    .published(new GregorianCalendar(2014, 11, 13).getTime())
+                    .published(new GregorianCalendar(2014, 10, 13).getTime())
                     .summary("This is the official book that inspired the film The Imitation Game, which stars " +
                             "Benedict Cumberbatch and Keira Knightley, and which has received eight Oscar " +
                             "nominations, including: Best film; Best Actor in a Leading Role; Best Supporting " +
@@ -202,7 +202,7 @@ public class DomainPopulator {
                     .title("The Lives of Others")
                     .author("Mukherjee, Neel")
                     .publisher(publishers.get(VINTAGE))
-                    .published(new GregorianCalendar(2015, 1, 8).getTime())
+                    .published(new GregorianCalendar(2015, 0, 8).getTime())
                     .summary("This is book shortlisted for the Man Booker Prize 2014. It was shortlisted for the " +
                             "Costa Novel Award 2014. Calcutta, 1967. Unnoticed by his family, Supratik has become " +
                             "dangerously involved in extremist political activism. Compelled by an idealistic " +
@@ -217,7 +217,7 @@ public class DomainPopulator {
                     .title("Fisken")
                     .author("Loe, Erlend")
                     .publisher(publishers.get(CAPPELEN))
-                    .published(new GregorianCalendar(1994, 1, 1).getTime())
+                    .published(new GregorianCalendar(1994, 0, 1).getTime())
                     .summary("Kurt er truckfører. Hver dag kjører han truck nede på kaia, og han løfter kasser " +
                             "som veier over 1000 kilo. Kurt har dessuten bart, og en søt kone og tre rare barn. " +
                             "En dag finner Kurt noe på kaia. Han finner noe han aldri har sett før. " +
@@ -228,7 +228,7 @@ public class DomainPopulator {
                     .title("Rumpemelk fra Afrika")
                     .author("Loe, Erlend")
                     .publisher(publishers.get(CAPPELEN_DAMM))
-                    .published(new GregorianCalendar(2012, 9, 1).getTime())
+                    .published(new GregorianCalendar(2012, 8, 1).getTime())
                     .summary("Marko kjeder seg og er tørst. Men han vil ikke ha vanlig melk. Han vil ha rumpemelk " +
                             "fra Afrika. Mamma og pappa har aldri hørt om slik melk og ber ham om å slutte å " +
                             "tøyse. \"Da drar jeg til Afrika og henter rumpemelk selv,\" sier han. " +
@@ -243,7 +243,7 @@ public class DomainPopulator {
                     .title("Doppler")
                     .author("Loe, Erlend")
                     .publisher(publishers.get(CAPPELEN_DAMM))
-                    .published(new GregorianCalendar(2013, 10, 1).getTime())
+                    .published(new GregorianCalendar(2013, 9, 1).getTime())
                     .summary("En samfunnskritisk roman om forbruk, eksistens ... og en elgkalv ved navn Bongo. " +
                             "Min far er død. Og i går tok jeg en elg av dage. Hva kan jeg si. Det var den eller " +
                             "meg. Doppler er en vellykket mann av sin tid. Familiefar med to barn, fint hus og " +
@@ -262,7 +262,7 @@ public class DomainPopulator {
                     .title("Naiv. Super")
                     .author("Loe, Erlend")
                     .publisher(publishers.get(CAPPELEN_DAMM))
-                    .published(new GregorianCalendar(2013, 1, 1).getTime())
+                    .published(new GregorianCalendar(2013, 0, 1).getTime())
                     .summary("JEG GIR STORT SETT FAEN I ROM, MEN JEG HAR PROBLEMER MED TID.Den 25 år gamle " +
                             "hovedpersonen har to venner. En god og en dårlig. Og så har han en bror som ikke " +
                             "er så altfor sympatisk. Når denne broren slår ham i krokket, raser tilværelsen " +
@@ -278,7 +278,7 @@ public class DomainPopulator {
                     .title("Fonk")
                     .author("Loe, Erlend")
                     .publisher(publishers.get(CAPPELEN_DAMM))
-                    .published(new GregorianCalendar(2011, 10, 1).getTime())
+                    .published(new GregorianCalendar(2011, 9, 1).getTime())
                     .summary("Mens Fvonk står i disse, og andre, tanker ruller en helt ren sort bil, tyskprodusert, " +
                             "med sotede vinduer inn i oppkjørselen og stanser uten å slå av motoren. Bilen ser " +
                             "offisiell ut og Fvonk reagerer negativt, han vil ikke ha noe med myndigheter og gjøre, " +
@@ -297,7 +297,7 @@ public class DomainPopulator {
                     .title("Station Eleven")
                     .author("St. John Mandel, Emily")
                     .publisher(publishers.get(PICADOR))
-                    .published(new GregorianCalendar(2015, 1, 1).getTime())
+                    .published(new GregorianCalendar(2015, 0, 1).getTime())
                     .summary("DAY ONE The Georgia Flu explodes over the surface of the earth like a neutron bomb. " +
                             "News reports put the mortality rate at over 99%. WEEK TWO Civilization has crumbled. " +
                             "YEAR TWENTY A band of actors and musicians called the Travelling Symphony move through " +
@@ -319,7 +319,7 @@ public class DomainPopulator {
                     .title("The Guest Cat")
                     .author("Hiraide, Takashi")
                     .publisher(publishers.get(PICADOR))
-                    .published(new GregorianCalendar(2014, 9, 25).getTime())
+                    .published(new GregorianCalendar(2014, 8, 25).getTime())
                     .translator("Selland, Eric")
                     .summary("THE SUNDAY TIMES AND NEW YORK TIMES BESTSELLER. A couple in their thirties live in a " +
                             "small rented cottage in a quiet part of Tokyo. They work at home as freelance writers. " +
@@ -339,7 +339,7 @@ public class DomainPopulator {
                     .title("Little Failure")
                     .author("Shteyngart, Gary")
                     .publisher(publishers.get(PENGUIN))
-                    .published(new GregorianCalendar(2014, 10, 29).getTime())
+                    .published(new GregorianCalendar(2014, 9, 29).getTime())
                     .summary("Gary Shteyngart's parents dreamed that he would become a lawyer, or at least an " +
                             "accountant, something their distracted son was simply not cut out to do. Fusing " +
                             "English and Russian, his mother created the term Failurchka - 'Little Failure' - " +

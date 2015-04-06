@@ -193,7 +193,7 @@ public class BookRepositoryJpaTest {
     }
 
     @Test
-    public void shouldFindMoreThanOneBookByPublisherPicador() {
+    public void shouldFindAtLeastOneBookByPublisherPicador() {
         final List<Book> books = bookRepository.findBooksBySearchType(
                 SearchType.Type.PUBLISHER_NAME, "picador", null, null);
         logger.debug("Found {} books by publisher '{}'", books.size(), "picador");

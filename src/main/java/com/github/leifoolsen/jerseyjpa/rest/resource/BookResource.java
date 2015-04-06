@@ -177,7 +177,10 @@ public class BookResource {
     @Compress
     public Response allBooks(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
         // Calling SearchResource directly is a hack, I think, but don't know how to do it otherwise
-        return resourceContext.getResource(SearchResource.class).allBooks(SearchType.Type.ANY.type(), null, offset, limit);
+        // @GET'ing like this: "/books/search" will hit the byIsbn method,
+        // so this method is needed to get all items without searchparams.
+        return resourceContext.getResource(
+                SearchResource.class).allBooks(SearchType.Type.ANY.type(), null, offset, limit);
     }
 
     @Path("search/{searchType}")

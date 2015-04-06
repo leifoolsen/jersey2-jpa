@@ -143,7 +143,7 @@ public class ErrorMessage {
      * @return a JSON formatted representation of the error message
      */
     public String toJSON() {
-        return JaxbHelper.marshall(this, false);
+        return JaxbHelper.marshal(this, false);
     }
 
     /**
@@ -152,7 +152,7 @@ public class ErrorMessage {
     @Override
     public String toString() {
         try {
-            return JaxbHelper.marshall(this, true);
+            return JaxbHelper.marshal(this, true);
         }
         catch (Exception e) {
             return "Marshalling failed with message: " + e.getMessage() +
@@ -169,7 +169,7 @@ public class ErrorMessage {
      * @return ErrorMessage instance
      */
     public static ErrorMessage fromJSON(final String jsonString) {
-        return JaxbHelper.unMarshall(ErrorMessage.class, jsonString);
+        return JaxbHelper.unMarshal(ErrorMessage.class, jsonString);
     }
 
 

@@ -1,15 +1,18 @@
 package com.github.leifoolsen.jerseyjpa.domain;
 
 import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
+import com.github.leifoolsen.jerseyjpa.util.DateTimeAdapter;
 import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
@@ -17,16 +20,18 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 import java.util.UUID;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
+@Table(indexes = {@Index(name = "book_title_index", columnList = "title")})
 public class Book {
     @Id
     @Column(length=36)
-    private String id;
+    private String id  = UUID.randomUUID().toString();
 
     @Version
     private Long version;
@@ -41,6 +46,7 @@ public class Book {
     @NotBlank
     private String author;
 
+    @XmlJavaTypeAdapter(DateTimeAdapter.class)
     @Temporal(TemporalType.DATE)
     private Date published;
 
@@ -55,7 +61,7 @@ public class Book {
     private Publisher publisher;
 
     protected Book() {}
-    
+
     private Book(Builder builder) {
         this.id = builder.id;
         this.version = builder.version;
@@ -126,7 +132,17 @@ public class Book {
 
     @Override
     public String toString() {
-        return isbn + ", " + title;
+        return "Book:{" +
+                "id='" + id + '\'' +
+                ", version=" + version +
+                ", isbn='" + isbn + '\'' +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", published=" + published +
+                ", translator='" + translator + '\'' +
+                ", summary='" + summary + '\'' +
+                ", publisher=" + publisher +
+                '}';
     }
 
     public static Builder with(final String isbn) { return new Builder(isbn); }
@@ -168,11 +184,11 @@ public class Book {
             return this;
         }
         public Builder title(final String title) {
-            this.title = StringUtil.blankToNull(title);
+            this.title = title;
             return this;
         }
         public Builder author(final String author) {
-            this.author = StringUtil.blankToNull(author);
+            this.author = author;
             return this;
         }
         public Builder published(final Date published) {
