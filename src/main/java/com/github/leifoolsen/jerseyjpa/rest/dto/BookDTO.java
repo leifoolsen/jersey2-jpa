@@ -1,7 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.rest.dto;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
-import com.github.leifoolsen.jerseyjpa.util.DateAdapter;
+import com.github.leifoolsen.jerseyjpa.util.DateTimeAdapter;
 
 import javax.ws.rs.FormParam;
 import java.util.Date;
@@ -20,7 +20,7 @@ public class BookDTO {
     public String author;
 
     @FormParam("published")
-    public DateAdapter published;
+    public DateTimeAdapter published;
 
     @FormParam("translator")
     public String translator;
@@ -49,8 +49,8 @@ public class BookDTO {
     public BookDTO isbn(final String isbn) { this.isbn = isbn; return this; }
     public BookDTO title(final String title) { this.title = title; return this; }
     public BookDTO author(final String author) { this.author = author; return this; }
-    public BookDTO published(final String published) { this.published = new DateAdapter(published); return this; }
-    public BookDTO published(final Date published) { this.published = new DateAdapter(published); return this; }
+    public BookDTO published(final String published) { this.published = new DateTimeAdapter(published); return this; }
+    public BookDTO published(final Date published) { this.published = new DateTimeAdapter(published); return this; }
     public BookDTO translator(final String translator) { this.translator = translator; return this; }
     public BookDTO summary(final String summary) { this.summary = summary; return this; }
     public BookDTO publisherCode(final String publisherCode) { this.publisherCode = publisherCode; return this; }

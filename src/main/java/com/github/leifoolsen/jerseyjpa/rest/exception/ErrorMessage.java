@@ -139,12 +139,12 @@ public class ErrorMessage {
         return constraintViolationMessages;
     }
 
-    /**
+    /*
      * @return a JSON formatted representation of the error message
-     */
     public String toJSON() {
         return JaxbHelper.marshal(this, false);
     }
+     */
 
     /**
      * @return a JSON formatted, pretty print, representation of the error message
@@ -164,14 +164,13 @@ public class ErrorMessage {
         }
     }
 
-    /**
+    /*
      * @param jsonString JSON representation of the ErrorMessage
      * @return ErrorMessage instance
-     */
     public static ErrorMessage fromJSON(final String jsonString) {
         return JaxbHelper.unMarshal(ErrorMessage.class, jsonString);
     }
-
+     */
 
     // --------------------------
     //

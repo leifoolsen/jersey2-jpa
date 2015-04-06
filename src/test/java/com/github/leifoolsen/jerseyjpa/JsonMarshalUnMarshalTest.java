@@ -101,23 +101,17 @@ public class JsonMarshalUnMarshalTest {
         JsonObject bookAsJsonObject = createBookAsJsonObject();
 
 
+        // See: https://sites.google.com/site/gson/gson-type-adapters-for-common-classes
+        // See: https://sites.google.com/site/gson/gson-type-adapters-for-common-classes-1
+        // See: http://www.javacreed.com/gson-typeadapter-example/
         JsonSerializer<Date> ser = new JsonSerializer<Date>() {
-            // See: https://sites.google.com/site/gson/gson-type-adapters-for-common-classes
-            // See: https://sites.google.com/site/gson/gson-type-adapters-for-common-classes-1
-            // See: http://www.javacreed.com/gson-typeadapter-example/
-
             @Override
-            public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext
-                    context) {
+            public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
                 return src == null ? null : new JsonPrimitive(src.getTime());
             }
         };
 
         JsonDeserializer<Date> deser = new JsonDeserializer<Date>() {
-            // See: https://sites.google.com/site/gson/gson-type-adapters-for-common-classes
-            // See: https://sites.google.com/site/gson/gson-type-adapters-for-common-classes-1
-            // See: http://www.javacreed.com/gson-typeadapter-example/
-
             @Override
             public Date deserialize(JsonElement json, Type typeOfT,
                                     JsonDeserializationContext context) throws JsonParseException {
@@ -177,8 +171,9 @@ public class JsonMarshalUnMarshalTest {
         JsonObject publisherAsJsonObject = reader.readObject();
         reader.close();
 
+        // See: http://docs.oracle.com/javaee/7/api/javax/json/JsonObject.html
         JsonBuilderFactory factory = Json.createBuilderFactory(null);
-        JsonObject bookAsJsonObject = factory.createObjectBuilder()
+        return factory.createObjectBuilder()
                 .add("id", "8343e028-1380-4822-8a29-55a2308f2b29")
                 .add("version", 0L)
                 .add("isbn", "9780752495620")
@@ -191,6 +186,6 @@ public class JsonMarshalUnMarshalTest {
 
         //logger.debug("{}", bookAsJsonObject.toString());
 
-        return bookAsJsonObject;
+        //return bookAsJsonObject;
     }
 }
