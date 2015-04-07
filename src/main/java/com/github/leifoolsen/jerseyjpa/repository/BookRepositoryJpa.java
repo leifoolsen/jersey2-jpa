@@ -12,8 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Provider;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +31,31 @@ public class BookRepositoryJpa {
     }
 
     public Book newBook(final Book book) {
-        return repository.persist(book);
+        try {
+            return repository.persist(book);
+        }
+        catch (PersistenceException e) {
+            if(findBookByISBN(book.getISBN()) != null) {
+                throw new EntityExistsException("Could not create book. Duplicate ISBN: " + book.getISBN(), e);
+            }
+            throw e;
+        }
     }
 
     public Book updateBook(final Book book) {
-        return repository.merge(book);
+        if(book.getId() == null) {
+            throw new ConstraintViolationException("Can not update book with id = null", null);
+        }
+        try {
+            return repository.merge(book);
+        }
+        catch (PersistenceException e) {
+            Book b = findBookByISBN(book.getISBN());
+            if(b != null && ! b.getId().equals(book.getId())) {
+                throw new EntityExistsException("Could not update book. Duplicate ISBN: " + book.getISBN(), e);
+            }
+            throw e;
+        }
     }
 
     public Book createOrUpdateBook(final Book book) {
@@ -56,9 +79,13 @@ public class BookRepositoryJpa {
     }
 
     public Book findBookByISBN(final String isbn) {
-        final String jpql = "select b from %s b where b.isbn = :isbn";
-        final QueryParameter qp = QueryParameter.with("isbn", isbn);
-        return RepositoryJPA.findFirstWithQuery(createQuery(jpql, Book.class, qp.parameters()));
+        String s = StringUtil.blankToNull(isbn);
+        if(s != null) {
+            final String jpql = "select b from %s b where b.isbn = :isbn";
+            final QueryParameter qp = QueryParameter.with("isbn", s);
+            return RepositoryJPA.findFirstWithQuery(createQuery(jpql, Book.class, qp.parameters()));
+        }
+        return null;
     }
 
     public List<Book> findBooksBySearchType(

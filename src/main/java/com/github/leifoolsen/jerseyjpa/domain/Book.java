@@ -31,7 +31,7 @@ import java.util.UUID;
 public class Book {
     @Id
     @Column(length=36)
-    private String id  = UUID.randomUUID().toString();
+    private String id;
 
     @Version
     private Long version;
@@ -175,12 +175,17 @@ public class Book {
         private Builder(final String isbn) {
             this.isbn = StringUtil.blankToNull(isbn);
         }
-        public Builder id(final String id) {
-            this.id = id;
+
+        private Builder id(final String id) {
+            this.id = StringUtil.blankToNull(id);
             return this;
         }
-        public Builder version(final Long version) {
+        private Builder version(final Long version) {
             this.version = version;
+            return this;
+        }
+        public Builder isbn(final String isbn) {
+            this.isbn = StringUtil.blankToNull(isbn);
             return this;
         }
         public Builder title(final String title) {
@@ -208,5 +213,11 @@ public class Book {
             return this;
         }
         public Book build() { return new Book(this); }
+
+        public Book build(final String id, final Long version) {
+            this.id(id);
+            this.version(version);
+            return new Book(this);
+        }
     }
 }

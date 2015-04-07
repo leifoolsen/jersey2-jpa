@@ -6,6 +6,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -200,6 +201,9 @@ public class ErrorMessage {
             }
             else if (t instanceof EntityNotFoundException) {
                 responseStatusCode = Response.Status.NOT_FOUND.getStatusCode();
+            }
+            else if (t instanceof EntityExistsException) {
+                responseStatusCode = Response.Status.CONFLICT.getStatusCode();
             }
             else if(t instanceof WebApplicationException) {
                 responseStatusCode = ((WebApplicationException) t).getResponse().getStatus();

@@ -6,6 +6,7 @@ import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.rest.exception.ErrorMessage;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
+import com.github.leifoolsen.jerseyjpa.util.DateTimeAdapter;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
@@ -38,6 +39,7 @@ public class BookResourceTest {
     private static final String ISBN_TRAVELING_TO_INFINITY = "9781846883668";
     private static final String ISBN_VREDENS_DRUER = "9788253019727";
     private static final String ISBN_GUIDE_TO_MIDDLE_EARTH = "9780752495620";
+    private static final String ISBN_DUPLICATE = "9781447279402";
 
     private static Server server;
     private static WebTarget target;
@@ -108,7 +110,7 @@ public class BookResourceTest {
     @Test
     public void newBookShouldReturn_CREATED() {
 
-        final Publisher publisher = new Publisher(DomainPopulator.CAPPELEN_DAMM, "Cappelen Damm");
+        final Publisher publisher = DomainPopulator.getPublishers().get(DomainPopulator.CAPPELEN_DAMM);
         final Book book = Book
                 .with("9788202289331")
                 .publisher(publisher)
@@ -130,6 +132,25 @@ public class BookResourceTest {
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void newBookWithDuplicateIsbnShouldReturn_CONFLICT() {
+
+        final Book book = Book.with(ISBN_DUPLICATE)
+                .title("The Guest Cat: DUPLICATE")
+                .author("Hiraide, Takashi")
+                .publisher(DomainPopulator.getPublishers().get(DomainPopulator.PICADOR))
+                .published(new GregorianCalendar(2014, 8, 25).getTime())
+                .translator("Selland, Eric")
+                .summary("....")
+                .build();
+
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
 
     @Test
     public void newBookWithFormPostShouldReturn_CREATED() {
@@ -157,7 +178,7 @@ public class BookResourceTest {
     }
 
     @Test
-    public void newBookWithFormPostMissingRequiredFieldShouldReturn_BAD_REQUEST() {
+    public void newBooktMissingRequiredFieldShouldReturn_BAD_REQUEST() {
         Form form = new Form()
             .param("isbn", "9780857520197")
             .param("author", "Watson, S. J.")
@@ -173,57 +194,9 @@ public class BookResourceTest {
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
-    /*
-    @Test
-    @Ignore("Allow only update on post")
-    public void newBookWithFormPutShouldReturn_CREADTED() {
-        Form form = new Form()
-                .param("isbn", "9780857520198")
-                .param("title", "Second Life, second edition")
-                .param("author", "Watson, S. J.")
-                .param("published", "2016-01-01")
-                .param("translator", null)
-                .param("summary", "The sensational new psychological thriller from ... ")
-                .param("publisher-code", "08575");
-
-        Response response = target
-                .path(BookResource.RESOURCE_PATH)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    }
-
 
     @Test
-    @Ignore("Allow only update on post")
-    public void newBookWithPutShouldReturn_CREATED() {
-
-        final Publisher publisher = new Publisher(DomainPopulator.CAPPELEN_DAMM, "Cappelen Damm");
-        final Book book = Book
-            .with("9788202289331")
-            .publisher(publisher)
-            .title("Kurtby")
-            .author("Loe, Erlend")
-            .published(new GregorianCalendar(2008, 1, 1).getTime())
-            .summary("Kurt og gjengen er på vei til Mummidalen da Kurt sovner ved rattet og trucken havner " +
-                    "i en svensk elv. Et langt stykke nedover elva ligger Kurtby - et lite samfunn hvor en " +
-                    "dame som heter Kirsti Brud styrer og steller i samråd med Den hellige ånd. Det går " +
-                    "ikke bedre enn at Kurt havner på kjøret, nærmere bestemt på Jesus-kjøret. " +
-                    "Så blir han pastor og går bananas.")
-            .build();
-
-        final Response response = target
-                .path(BookResource.RESOURCE_PATH)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .put(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
-
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    }
-    */
-
-    @Test
-    public void bookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {
+    public void newBookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {
 
         final Publisher nonExistingPublisher = new Publisher("22222", "Does not exist");
         final Book book = Book
@@ -231,14 +204,14 @@ public class BookResourceTest {
                 .publisher(nonExistingPublisher)
                 .title("A title")
                 .author("Loe, Erlend")
-                .published(new GregorianCalendar(2008, 1, 1).getTime())
+                .published(new GregorianCalendar(2008, 0, 1).getTime())
                 .summary("Lorem ipsum etc")
                 .build();
 
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .put(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
+                .post(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -252,6 +225,7 @@ public class BookResourceTest {
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
         Book bookToUpdate = response.readEntity(Book.class);
         assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
 
@@ -264,6 +238,72 @@ public class BookResourceTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Book b = response.readEntity(Book.class);
         assertThat(b.getTitle(), equalTo("Vredens druer"));
+    }
+
+    @Test
+    public void updateIsbnToDuplicateValueShouldReturn_CONFLICT() {
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_VREDENS_DRUER)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        Book bookToUpdate = response.readEntity(Book.class);
+        assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
+
+        // Put with Form
+        Form form = new Form()
+                .param("id", bookToUpdate.getId())
+                .param("version", bookToUpdate.getVersion().toString())
+                .param("isbn", ISBN_DUPLICATE)
+                .param("title", bookToUpdate.getTitle())
+                .param("author", bookToUpdate.getAuthor())
+                .param("published", DateTimeAdapter.dateToString(bookToUpdate.getPublished()))
+                .param("translator", bookToUpdate.getTranslator())
+                .param("summary", bookToUpdate.getSummary())
+                .param("publisher-code", bookToUpdate.getPublisher().getCode());
+
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void updateBookWithNullIdShouldReturn_BAD_REQUEST() {
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_VREDENS_DRUER)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        Book bookToUpdate = response.readEntity(Book.class);
+        assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
+
+        // Put with Form
+        Form form = new Form()
+                .param("id", null)
+                .param("version", bookToUpdate.getVersion().toString())
+                .param("isbn", bookToUpdate.getISBN())
+                .param("title", bookToUpdate.getTitle())
+                .param("author", bookToUpdate.getAuthor())
+                .param("published", DateTimeAdapter.dateToString(bookToUpdate.getPublished()))
+                .param("translator", bookToUpdate.getTranslator())
+                .param("summary", bookToUpdate.getSummary())
+                .param("publisher-code", bookToUpdate.getPublisher().getCode());
+
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
 

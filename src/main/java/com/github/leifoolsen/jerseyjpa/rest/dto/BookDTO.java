@@ -10,6 +10,9 @@ public class BookDTO {
     @FormParam("id")
     public String id;
 
+    @FormParam("version")
+    public Long version;
+
     @FormParam("isbn")
     public String isbn;
 
@@ -34,18 +37,19 @@ public class BookDTO {
     public BookDTO() {}
     public BookDTO(final Book book) {
         if(book != null) {
-            this
-            .id(book.getId())
-            .isbn(book.getISBN())
-            .title(book.getTitle())
-            .author(book.getAuthor())
-            .published(book.getPublished())
-            .translator(book.getTranslator())
-            .summary(book.getSummary())
-            .publisherCode(book.getPublisher() != null ? book.getPublisher().getCode() : null) ;
+            this.id(book.getId())
+                .version(book.getVersion())
+                .isbn(book.getISBN())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .published(book.getPublished())
+                .translator(book.getTranslator())
+                .summary(book.getSummary())
+                .publisherCode(book.getPublisher() != null ? book.getPublisher().getCode() : null) ;
         }
     }
     public BookDTO id(final String id) { this.id = id; return this; }
+    public BookDTO version(final Long version) { this.version = version; return this; }
     public BookDTO isbn(final String isbn) { this.isbn = isbn; return this; }
     public BookDTO title(final String title) { this.title = title; return this; }
     public BookDTO author(final String author) { this.author = author; return this; }
