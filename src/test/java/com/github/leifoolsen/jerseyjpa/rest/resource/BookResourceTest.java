@@ -106,6 +106,32 @@ public class BookResourceTest {
     }
 
     @Test
+    public void newBookShouldReturn_CREATED() {
+
+        final Publisher publisher = new Publisher(DomainPopulator.CAPPELEN_DAMM, "Cappelen Damm");
+        final Book book = Book
+                .with("9788202289331")
+                .publisher(publisher)
+                .title("Kurtby")
+                .author("Loe, Erlend")
+                .published(new GregorianCalendar(2008, 1, 1).getTime())
+                .summary("Kurt og gjengen er på vei til Mummidalen da Kurt sovner ved rattet og trucken havner " +
+                        "i en svensk elv. Et langt stykke nedover elva ligger Kurtby - et lite samfunn hvor en " +
+                        "dame som heter Kirsti Brud styrer og steller i samråd med Den hellige ånd. Det går " +
+                        "ikke bedre enn at Kurt havner på kjøret, nærmere bestemt på Jesus-kjøret. " +
+                        "Så blir han pastor og går bananas.")
+                .build();
+
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
     public void newBookWithFormPostShouldReturn_CREATED() {
         Form form = new Form()
             .param("isbn", "9780297871934")
@@ -147,7 +173,9 @@ public class BookResourceTest {
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
+    /*
     @Test
+    @Ignore("Allow only update on post")
     public void newBookWithFormPutShouldReturn_CREADTED() {
         Form form = new Form()
                 .param("isbn", "9780857520198")
@@ -166,7 +194,9 @@ public class BookResourceTest {
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
+
     @Test
+    @Ignore("Allow only update on post")
     public void newBookWithPutShouldReturn_CREATED() {
 
         final Publisher publisher = new Publisher(DomainPopulator.CAPPELEN_DAMM, "Cappelen Damm");
@@ -190,6 +220,7 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
+    */
 
     @Test
     public void bookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {

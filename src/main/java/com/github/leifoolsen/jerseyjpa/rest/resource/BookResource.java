@@ -55,6 +55,12 @@ public class BookResource {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(final Book book) {
+        return create(new BookDTO(book));
+    }
+
+    @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response create(@BeanParam final BookDTO params) {
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(params.isbn);
@@ -99,13 +105,13 @@ public class BookResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrUpdate(final Book book) {
-        return createOrUpdate(new BookDTO(book));
+    public Response update(final Book book) {
+        return update(new BookDTO(book));
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response createOrUpdate(@BeanParam final BookDTO params) {
+    public Response update(@BeanParam final BookDTO params) {
 
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(params.isbn);
         Response.ResponseBuilder responseBuilder;
@@ -117,7 +123,7 @@ public class BookResource {
 
             if (publisher == null) {
                 throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
-                        "Could not create book. Publisher with code "
+                        "Could not update book. Publisher with code "
                                 + params.publisherCode + " was not found", null);
             }
         }
@@ -134,12 +140,16 @@ public class BookResource {
         if(result != null) {
             result = repository.updateBook(builder.id(result.getId()).version(result.getVersion()).build());
             responseBuilder = Response.ok(result).location(uriBuilder.build());
-            logger.debug("Updated book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+            logger.debug("Updated book with ISBN: {} and title: {}", result.getISBN(), result.getTitle());
         }
         else {
-            result = repository.newBook(builder.build());
-            responseBuilder = Response.created(uriBuilder.build()).entity(result);
-            logger.debug("Created book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+            //result = repository.newBook(builder.build());
+            //responseBuilder = Response.created(uriBuilder.build()).entity(result);
+            //logger.debug("Created book with ISBN: {}. Title: {}", result.getISBN(), result.getTitle());
+
+            throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
+                    "Could not update book with ISBN: {}. This book does does not exist in database.", null);
+
         }
         return responseBuilder.build();
     }

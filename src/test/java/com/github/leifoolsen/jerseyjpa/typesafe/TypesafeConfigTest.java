@@ -16,7 +16,7 @@ public class TypesafeConfigTest {
      *  See: https://marcinkubala.wordpress.com/2013/10/09/typesafe-config-hocon/
      *  See: http://javaeeconfig.blogspot.no/2014/08/overview-of-existing-configuration.html
      *  See: http://vastdevblog.vast.com/blog/2012/06/16/creating-named-guice-bindings-for-typesafe-config-properties/
-     *
+     * See: http://stackoverflow.com/questions/18668883/using-typesafes-config-to-manage-my-database-connection
      */
 
     @Test
