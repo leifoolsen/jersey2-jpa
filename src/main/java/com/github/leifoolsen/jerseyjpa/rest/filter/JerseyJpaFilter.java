@@ -38,7 +38,7 @@ public class JerseyJpaFilter  implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        logger.debug("Filtering request");
+        logger.debug("JerseyJpaFilter, doFilter");
         connection.unitOfWork().begin();
         try {
             chain.doFilter(request, response);

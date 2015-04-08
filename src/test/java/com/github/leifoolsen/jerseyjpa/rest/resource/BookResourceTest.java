@@ -26,11 +26,10 @@ import javax.ws.rs.core.Response;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class BookResourceTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -419,6 +418,9 @@ public class BookResourceTest {
                 .queryParam("q", "hawking")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
+
+        List<Object> objects = response.getHeaders().get("Content-Encoding");
+        assertTrue(objects!=null && objects.contains("gzip"));
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
