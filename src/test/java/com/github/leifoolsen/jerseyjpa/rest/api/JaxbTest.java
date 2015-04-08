@@ -1,4 +1,4 @@
-package com.github.leifoolsen.jerseyjpa.rest.resource;
+package com.github.leifoolsen.jerseyjpa.rest.api;
 
 import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;

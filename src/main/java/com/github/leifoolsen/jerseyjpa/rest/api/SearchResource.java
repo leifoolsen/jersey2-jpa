@@ -1,4 +1,4 @@
-package com.github.leifoolsen.jerseyjpa.rest.resource;
+package com.github.leifoolsen.jerseyjpa.rest.api;
 
 import com.github.leifoolsen.jerseyjpa.constraint.SearchType;
 import com.github.leifoolsen.jerseyjpa.domain.Book;

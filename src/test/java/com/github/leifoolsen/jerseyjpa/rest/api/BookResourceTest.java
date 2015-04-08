@@ -1,4 +1,4 @@
-package com.github.leifoolsen.jerseyjpa.rest.resource;
+package com.github.leifoolsen.jerseyjpa.rest.api;
 
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
@@ -26,8 +26,14 @@ import javax.ws.rs.core.Response;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class BookResourceTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
