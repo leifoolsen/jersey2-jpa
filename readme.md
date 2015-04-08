@@ -13,12 +13,18 @@ using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence.
 * Interceptor 
     * WriterInterceptor to enable GZIP compression on server side
     * ReaderInterceptor to deflate GZIP on client side
+* ResponseFilter
+    * Set default response header content-type to utf-8 
 * ExceptionMapper
     * Mapping all exceptions to responses and sending a uniform ErrorMessage as JSON to the client
 * @Context
     * Constructor injection of UriInfo and ResourceContext
 * @BeanParam
     * To inject parameters from Form POST and PUT
+* Embedded database
+    * H2 or HSQL
+* JPA provider    
+    * EclipseLink or Hibernate
 
 ## Steps to run this project
 * Fork, Clone or Download ZIP
