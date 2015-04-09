@@ -5,18 +5,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DateTimeAdapter extends XmlAdapter<String, Date> {
-
-    // See: http://blog.bdoughan.com/2010/07/xmladapter-jaxbs-secret-weapon.html
-    // See: http://blog.bdoughan.com/2011/05/jaxb-and-joda-time-dates-and-times.html
-    // See: http://stackoverflow.com/questions/3052513/jax-rs-json-java-util-date-unmarshall
+public class DateAdapter extends XmlAdapter<String, Date> {
     private Date date;
 
-    public DateTimeAdapter() {}
+    public DateAdapter(String v) { this.date = stringToDate(v); }
 
-    public DateTimeAdapter(String v) { this.date = stringToDate(v); }
-
-    public DateTimeAdapter(Date v) { this.date = v; }
+    public DateAdapter(Date v) { this.date = v; }
 
     public Date getDate(){
         return this.date;
@@ -34,7 +28,7 @@ public class DateTimeAdapter extends XmlAdapter<String, Date> {
 
     public static String dateToString(final Date v) {
         if(v != null) {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").format(v);
+            return new SimpleDateFormat("yyyy-MM-dd").format(v);
         }
         return null;
     }
@@ -57,5 +51,4 @@ public class DateTimeAdapter extends XmlAdapter<String, Date> {
         }
         return null;
     }
-
 }

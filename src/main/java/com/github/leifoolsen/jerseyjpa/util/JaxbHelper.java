@@ -50,11 +50,24 @@ public class JaxbHelper {
     }
 
     public static <T> T unMarshal(final Class<T> entityClass, final String document) {
+        // See: http://eclipse.dzone.com/articles/eclipselink-moxy-and-java-api
+
+        if(entityClass == null ) {
+            throw new IllegalArgumentException("Entity class to unmarshall may not be null.");
+        }
+        StringReader reader = new StringReader(document);
+        JsonReader jsonReader = Json.createReader(reader);
+        JsonObject jsonObject = jsonReader.readObject();
+        jsonReader.close();
+        return unMarshal(entityClass, jsonObject);
+    }
+
+    public static <T> T unMarshal(final Class<T> entityClass, final JsonObject jsonObject) {
+        // See: http://eclipse.dzone.com/articles/eclipselink-moxy-and-java-api
         if(entityClass == null ) {
             throw new IllegalArgumentException("Entity class to unmarshall may not be null.");
         }
         try {
-            // See: http://eclipse.dzone.com/articles/eclipselink-moxy-and-java-api
             JAXBContext jc = JAXBContextFactory.createContext(new Class[] {entityClass}, null);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             unmarshaller.setProperty(UnmarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON); // MediaType.APPLICATION_XML
@@ -63,17 +76,14 @@ public class JaxbHelper {
             //unmarshaller.setProperty(UnmarshallerProperties.JSON_ATTRIBUTE_PREFIX, "@");
             //unmarshaller.setProperty(UnmarshallerProperties.JSON_NAMESPACE_SEPARATOR, ':');
 
-            StringReader reader = new StringReader(document);
-            JsonReader jsonReader = Json.createReader(reader);
-            JsonObject jsonObject = jsonReader.readObject();
-            jsonReader.close();
             JsonStructureSource objectSource = new JsonStructureSource(jsonObject);
 
-            return (T) unmarshaller.unmarshal(objectSource, entityClass).getValue();
+            return unmarshaller.unmarshal(objectSource, entityClass).getValue();
         }
         catch (Throwable t) {
             throw new IllegalArgumentException("Failed to unmarshall entity: " + entityClass.getSimpleName() +
                     ". Message: " + t.getMessage(), t);
         }
     }
+
 }

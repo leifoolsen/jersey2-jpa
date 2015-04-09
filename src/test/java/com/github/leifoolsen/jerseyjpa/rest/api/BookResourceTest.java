@@ -7,7 +7,6 @@ import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.rest.exception.ErrorMessage;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
 import com.github.leifoolsen.jerseyjpa.util.CollectionJson;
-import com.github.leifoolsen.jerseyjpa.util.DateTimeAdapter;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
@@ -26,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -81,11 +81,12 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Book book = response.readEntity(Book.class);
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        Book book = collectionJson.collection().item(0).unMarshalData(Book.class);
         assertEquals(ISBN_TRAVELING_TO_INFINITY, book.getISBN());
 
-        //CollectionJson collection = response.readEntity(CollectionJson.class);
-        //logger.debug("{}", collection.toString());
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
@@ -246,14 +247,25 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Book bookToUpdate = response.readEntity(Book.class);
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+
+        Book bookToUpdate = collectionJson.collection().item(0).unMarshalData(Book.class);
         assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
 
-        Book updatedBook = Book.with(bookToUpdate, true).title("Vredens druer").build();
+
+        Form form = new Form();
+        Map<String, String> items = collectionJson.collection().items().get(0).nameValueItems();
+        for (Map.Entry<String, String> entry : items.entrySet()) {
+            form.param(entry.getKey(), entry.getValue());
+        }
+        form.asMap().remove("title");
+        form.param("title", "Vredens druer");
+
         response = target
                 .path(BookResource.RESOURCE_PATH)
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .put(Entity.entity(updatedBook, MediaType.APPLICATION_JSON_TYPE));
+                .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Book b = response.readEntity(Book.class);
@@ -270,20 +282,17 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Book bookToUpdate = response.readEntity(Book.class);
-        assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        assertEquals(ISBN_VREDENS_DRUER, collectionJson.collection().items().get(0).data("isbn").value());
 
-        // Put with Form
-        Form form = new Form()
-                .param("id", bookToUpdate.getId())
-                .param("version", bookToUpdate.getVersion().toString())
-                .param("isbn", ISBN_DUPLICATE)
-                .param("title", bookToUpdate.getTitle())
-                .param("author", bookToUpdate.getAuthor())
-                .param("published", DateTimeAdapter.dateToString(bookToUpdate.getPublished()))
-                .param("translator", bookToUpdate.getTranslator())
-                .param("summary", bookToUpdate.getSummary())
-                .param("publisher-code", bookToUpdate.getPublisher().getCode());
+        Form form = new Form();
+        Map<String, String> items = collectionJson.collection().items().get(0).nameValueItems();
+        for (Map.Entry<String, String> entry : items.entrySet()) {
+            form.param(entry.getKey(), entry.getValue());
+        }
+        form.asMap().remove("isbn");
+        form.param("isbn", ISBN_DUPLICATE);
 
         response = target
                 .path(BookResource.RESOURCE_PATH)
@@ -303,20 +312,18 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Book bookToUpdate = response.readEntity(Book.class);
-        assertEquals(ISBN_VREDENS_DRUER, bookToUpdate.getISBN());
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
 
-        // Put with Form
-        Form form = new Form()
-                .param("id", null)
-                .param("version", bookToUpdate.getVersion().toString())
-                .param("isbn", bookToUpdate.getISBN())
-                .param("title", bookToUpdate.getTitle())
-                .param("author", bookToUpdate.getAuthor())
-                .param("published", DateTimeAdapter.dateToString(bookToUpdate.getPublished()))
-                .param("translator", bookToUpdate.getTranslator())
-                .param("summary", bookToUpdate.getSummary())
-                .param("publisher-code", bookToUpdate.getPublisher().getCode());
+        assertEquals(ISBN_VREDENS_DRUER, collectionJson.collection().items().get(0).data("isbn").value());
+
+        Form form = new Form();
+        Map<String, String> items = collectionJson.collection().items().get(0).nameValueItems();
+        for (Map.Entry<String, String> entry : items.entrySet()) {
+            form.param(entry.getKey(), entry.getValue());
+        }
+        form.asMap().remove("id");
+        form.param("id", null);
 
         response = target
                 .path(BookResource.RESOURCE_PATH)
