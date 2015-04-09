@@ -44,49 +44,46 @@
     </properties>
 
     <dependencies>
-        <!-- Basic Jetty -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
         </dependency>
 
-        <!-- For Servlet 3 annotations in embedded Jetty -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-annotations</artifactId>
         </dependency>
 
-        <!-- Servlet3 -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
-        <!-- For Servlet3 annotation based configuration -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-servlet</artifactId>
         </dependency>
 
-        <!-- JSON support -->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-moxy</artifactId>
         </dependency>
 
-        <!-- Bean validation -->
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-bean-validation</artifactId>
         </dependency>
 
-        <!-- Typesafe configuration for JVM languages -->
+        <dependency>
+            <groupId>net.hamnaberg.rest</groupId>
+            <artifactId>json-collection</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
         </dependency>
 
-        <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -367,6 +364,13 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>2.3.1</version>
+            </dependency>
+
+            <!-- Collection+JSON -->
+            <dependency>
+                <groupId>net.hamnaberg.rest</groupId>
+                <artifactId>json-collection</artifactId>
+                <version>3.1.0</version>
             </dependency>
 
             <!-- Hibernate JPA -->

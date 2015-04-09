@@ -430,7 +430,7 @@ public class BookResourceTest {
     }
 
     @Test
-    public void contentEncodingGzipAndContentTypeUtf8() {
+    public void headerShouldContainContentEncodingGzipAndContentTypeUtf8() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/any")
