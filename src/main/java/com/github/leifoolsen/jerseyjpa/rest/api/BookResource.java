@@ -8,9 +8,7 @@ import com.github.leifoolsen.jerseyjpa.exception.ApplicationException;
 import com.github.leifoolsen.jerseyjpa.repository.BookRepositoryJpa;
 import com.github.leifoolsen.jerseyjpa.rest.dto.BookDTO;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
-import com.github.leifoolsen.jerseyjpa.util.DatabaseConnection;
-import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
-import com.github.leifoolsen.jerseyjpa.util.StringUtil;
+import com.github.leifoolsen.jerseyjpa.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,9 +106,8 @@ public class BookResource {
                 .build(params.id, params.version);
 
         Book updatedBook = repository.updateBook(bookToUpdate);
-        responseBuilder = Response.ok(updatedBook).location(uriBuilder.build());
         logger.debug("Updated book with ISBN: {} and title: {}", bookToUpdate.getISBN(), bookToUpdate.getTitle());
-
+        responseBuilder = Response.ok(updatedBook).location(uriBuilder.build());
         return responseBuilder.build();
     }
 
@@ -143,19 +140,73 @@ public class BookResource {
 
     @GET
     @Path("{isbn}")
-    public Book byIsbn(@Isbn @PathParam("isbn") final String isbn) {
+    public Response byIsbn(@Isbn @PathParam("isbn") final String isbn) {
 
-        final Book result = repository.findBookByISBN(isbn);
-
-        if (result == null) {
+        final Book book = repository.findBookByISBN(isbn);
+        if (book == null) {
             throw new WebApplicationException("Book with isbn: '"+ isbn + "' was not found",
                     Response.status(Response.Status.NOT_FOUND)
                             .location(uriInfo.getAbsolutePath())
                             .build()
             );
         }
-        return result; // Response.Status.OK
-        // return Response.Status.BAD_REQUEST if Bean validation fails
+
+    /*
+    {
+        "collection": {
+            "version": "1.0",
+            "href": "http://api.example.org/books",
+            "items": [
+                {
+                    "href": "http://api.example.org/books/9781846883668",
+                    "data": [
+                          { "name": "id",        "value": "c814760e-7b2a-4623-93c3-48689260599b", "prompt": "Identifier" },
+                          { "name": "version",   "value": "1": "Version" },
+                          { "name": "isbn",      "value": "9781846883668", "prompt": "ISBN" },
+                          { "name": "title",     "value": "title":"Travelling to Infinity: The True Story", "prompt": "Title" },
+                          { "name": "author",    "value": "Hawking, Jane", "prompt": "Author" },
+                          { "name": "published", "value": ""2014-12-18T00:00:00+01", "prompt": "Date published" },
+                          { "name": "summary",   "value": "Soon to be a major motion picture starring...", "prompt": "Summary" }
+                    ],
+                    "links" : [
+                      {"rel" : "publisher",  "href" : "http://examples.org/books/9781846883668/publisher", "prompt" : "Publisher"},
+                      {"rel" : "authorship", "href" : "http://examples.org/books/search/author?q=Hawking, Jane", "prompt" : "Books by this author"}
+                    ]
+                }
+            ]
+        }
+    }
+     */
+
+        String resourcePath = uriInfo.getRequestUriBuilder().toString().replace("9781846883668", "");
+        CollectionJson collectionJson = CollectionJson.newCollection("1.0", resourcePath);
+        CollectionJson.Collection collection = collectionJson.collection();
+
+        CollectionJson.Item item = new CollectionJson.Item(uriInfo.getRequestUriBuilder().toString());
+        item.addData("id",         book.getId(), "Id")
+            .addData("version",    book.getVersion().toString(), "Version")
+            .addData("isbn",       book.getISBN(), "ISBN")
+            .addData("title",      book.getTitle(), "Title")
+            .addData("author",     book.getAuthor(), "Author")
+            .addData("published",  DateTimeAdapter.dateToString(book.getPublished()), "Published")
+            .addData("summary", book.getSummary(), "Summary");
+        item.addLink("publisher",  uriInfo.getRequestUriBuilder().path("publisher").build().toString(), "Publisher")
+            .addLink("authorship", resourcePath + "search/author?q=" + book.getAuthor(), "Books by this author");
+
+        collection.addItem(item);
+
+
+        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
+        Response.ResponseBuilder responseBuilder = Response.ok(book).location(uriBuilder.build());
+        return responseBuilder.build();
+
+    }
+
+    @GET
+    @Path("{isbn}/publisher")
+    public Publisher bookPublisher(@Isbn @PathParam("isbn") final String isbn) {
+        final Book book = repository.findBookByISBN(isbn);
+        return book.getPublisher();
     }
 
     @GET

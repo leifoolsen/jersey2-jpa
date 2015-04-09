@@ -156,7 +156,7 @@ public class JsonMarshalUnMarshalTest {
                 .title("Guide to Middle Earth: Tolkien and The Lord of the Rings")
                 .author("Duriez, Colin")
                 .publisher(publisher)
-                .published(new GregorianCalendar(2013, 1, 1).getTime())
+                .published(new GregorianCalendar(2013, 0, 1).getTime())
                 .summary("An illuminating guide to Middle-earth and the man who created it.")
                 .build();
     }

@@ -6,6 +6,7 @@ import com.github.leifoolsen.jerseyjpa.embeddedjetty.JettyFactory;
 import com.github.leifoolsen.jerseyjpa.rest.application.JerseyJpaApp;
 import com.github.leifoolsen.jerseyjpa.rest.exception.ErrorMessage;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
+import com.github.leifoolsen.jerseyjpa.util.CollectionJson;
 import com.github.leifoolsen.jerseyjpa.util.DateTimeAdapter;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
 import org.eclipse.jetty.server.Server;
@@ -82,6 +83,9 @@ public class BookResourceTest {
 
         Book book = response.readEntity(Book.class);
         assertEquals(ISBN_TRAVELING_TO_INFINITY, book.getISBN());
+
+        //CollectionJson collection = response.readEntity(CollectionJson.class);
+        //logger.debug("{}", collection.toString());
     }
 
     @Test
@@ -109,6 +113,19 @@ public class BookResourceTest {
         ErrorMessage errorMessage = response.readEntity(ErrorMessage.class);
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), errorMessage.getResponseStatusCode());
     }
+
+    @Test
+    public void publisherOfBookShouldReturn_OK() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path(ISBN_TRAVELING_TO_INFINITY)
+                .path("publisher")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
 
     @Test
     public void newBookShouldReturn_CREATED() {
