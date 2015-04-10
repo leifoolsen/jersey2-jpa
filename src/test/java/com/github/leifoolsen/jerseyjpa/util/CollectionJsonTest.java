@@ -50,6 +50,26 @@ public class CollectionJsonTest {
        //logger.debug(collectionJson.toString());
     }
 
+    @Test
+    public void oneTemplate() {
+        TestDTO testDTO = new TestDTO("1", "foo", "bar", "baz");
+
+        CollectionJson collectionJson = CollectionJson.newTemplate();
+
+        collectionJson.template()
+                .addData("id", testDTO.id)
+                .addData("foo", testDTO.foo)
+                .addData("bar", testDTO.bar)
+                .addData("baz", testDTO.baz);
+
+
+        TestDTO dto = collectionJson.template().unMarshalData(TestDTO.class);
+        assertThat(testDTO, equalTo(dto));
+
+        //logger.debug(collectionJson.toString());
+    }
+
+
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class TestDTO {

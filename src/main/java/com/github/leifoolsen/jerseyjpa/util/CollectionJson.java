@@ -228,46 +228,43 @@ public class CollectionJson {
         private List<TemplateData> data;
 
         protected Template() {}
-        public Template addData(TemplateData templateData) {
+
+        public Template addData(String name, String value) {
             if(data == null) data = new ArrayList<>();
-            data.add(templateData);
+            data.add(new TemplateData(name, value));
             return this;
+        }
+
+        List<TemplateData> data() {
+            return data;
+        }
+
+        TemplateData data(int index) {
+            return data.get(index);
+        }
+
+        public <T> T unMarshalData(final Class<T> entityClass) {
+            JsonBuilderFactory factory = Json.createBuilderFactory(null);
+            JsonObjectBuilder builder = factory.createObjectBuilder();
+
+            for (TemplateData d : data) {
+                builder.add(d.name, d.value);
+            }
+            JsonObject jsonObject = builder.build();
+            return JaxbHelper.unMarshal(entityClass, jsonObject);
         }
     }
 
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class TemplateData {
-        List<TemplateDataItem> items;
-
-        protected TemplateData() {}
-        protected TemplateData addItem(String name, String value) {
-            if(items == null) items = new ArrayList<>();
-            items.add(new TemplateDataItem(name, value));
-            return this;
-        }
-
-        Map<String, String> nameValueItems() {
-            Map<String, String> result = new HashMap<>();
-            for (TemplateDataItem item : items) {
-                result.put(item.name, item.value);
-            }
-            return result;
-        }
-
-    }
-
-    @XmlRootElement
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class TemplateDataItem {
         private String name;
         private String value;
 
-        protected TemplateDataItem() {}
-        protected TemplateDataItem(String name, String value) {
+        protected TemplateData() {}
+        protected TemplateData(String name, String value) {
             this.name = name;
             this.value = value;
         }
-
     }
 }
