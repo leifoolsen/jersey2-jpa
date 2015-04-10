@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 
 @Singleton
 @Path(BookResource.RESOURCE_PATH)
@@ -142,55 +143,6 @@ public class BookResource {
     }
 
 
-    /*
-     Return entity using collection+json
-
-    {
-        "collection": {
-            "version": "1.0",
-            "href": "http://api.example.org/books",
-            "links" : [
-                {"rel" : "feed", "href" : "http://api.example.org/books/rss"},
-                {"rel" : "template", "href" : "http://api.example.org/books/template"}
-            ],
-            "items": [
-                {
-                    "href": "http://api.example.org/books/9781846883668",
-                    "data": [
-                          { "name": "id",             "value": "c814760e-7b2a-4623-93c3-48689260599b", "prompt": "Identifier" },
-                          { "name": "version",        "value": "1", "prompt": "Version" },
-                          { "name": "isbn",           "value": "9781846883668", "prompt": "ISBN" },
-                          { "name": "title",          "value": "title":"Travelling to Infinity: The True Story", "prompt": "Title" },
-                          { "name": "author",         "value": "Hawking, Jane", "prompt": "Author" },
-                          { "name": "published",      "value": ""2014-12-18", "prompt": "Date published" },
-                          { "name": "summary",        "value": "Soon to be a major motion picture starring...", "prompt": "Summary" },
-                          { "name": "publisher.code", "value": "18468", "prompt": "Publisher code" }
-                    ],
-                    "links" : [
-                      {"rel" : "publisher",  "href" : "http://examples.org/books/9781846883668/publisher", "prompt" : "Publisher"},
-                      {"rel" : "authorship", "href" : "http://examples.org/books/search/author?q=Hawking, Jane", "prompt" : "Books by this author"}
-                    ]
-                }
-            ]
-        }
-    }
-    {
-        "template" : {
-            "data" : [
-                { "name": "id",             "value": "c814760e-7b2a-4623-93c3-48689260599b" },
-                { "name": "version",        "value": "1" },
-                { "name": "isbn",           "value": "9781846883668" },
-                { "name": "title",          "value": "title":"Travelling to Infinity: The True Story" },
-                { "name": "author",         "value": "Hawking, Jane" },
-                { "name": "published",      "value": ""2014-12-18" },
-                { "name": "summary",        "value": "Soon to be a major motion picture starring..." }
-                { "name": "publisher.code", "value": "18468" }
-            ]
-        }
-    }
-
-     */
-
     @GET
     @Path("{isbn}")
     public Response byIsbn(@Isbn @PathParam("isbn") final String isbn) {
@@ -210,11 +162,11 @@ public class BookResource {
 
         CollectionJson.Item item = new CollectionJson.Item(uriInfo.getRequestUriBuilder().toString());
         item.addData("id", book.getId(), "Id")
-            .addData("version",        book.getVersion().toString(), "Version")
+            .addData("version", book.getVersion().toString(), "Version")
             .addData("isbn",           book.getISBN(), "ISBN")
             .addData("title",          book.getTitle(), "Title")
             .addData("author",         book.getAuthor(), "Author")
-            .addData("published",      DateAdapter.dateToString(book.getPublished()), "Published")
+            .addData("published", DateAdapter.dateToString(book.getPublished()), "Published")
             .addData("summary",        book.getSummary(), "Summary")
             .addData("publisher.code", book.getPublisher().getCode(), "Publisher code");
         item.addLink("publisher",      uriInfo.getRequestUriBuilder().path("publisher").build().toString(), "Publisher")
@@ -257,4 +209,38 @@ public class BookResource {
     public String ping() {
         return "Pong!"; // --> Response.Status.OK
     }
+
+
+    private CollectionJson.Item bookToItem(final Book book) {
+
+        URI baseUri = uriInfo.getBaseUri();
+        String path = BookResource.class.getAnnotation(Path.class).value();
+        UriBuilder uriBuilder = UriBuilder.fromUri(baseUri).path(path); // e.g. http://example.org/api/books
+
+
+        String resourcePath = uriInfo.getRequestUriBuilder().toString().replace(book.getISBN(), "");
+        //UriBuilder uriBuilder = UriBuilder.fromPath(resourcePath);
+
+
+        CollectionJson.Item item = new CollectionJson.Item(uriInfo.getRequestUriBuilder().toString());
+        item.addData("id", book.getId(), "Id")
+            .addData("version", book.getVersion().toString(), "Version")
+            .addData("isbn", book.getISBN(), "ISBN")
+            .addData("title", book.getTitle(), "Title")
+            .addData("author", book.getAuthor(), "Author")
+            .addData("published", DateAdapter.dateToString(book.getPublished()), "Published")
+            .addData("summary", book.getSummary(), "Summary")
+            .addData("publisher.code", book.getPublisher().getCode(), "Publisher code");
+        item.addLink("self", uriBuilder.clone().path(book.getISBN()).path("publisher").build().toString(), "Publisher")
+            .addLink("publisher", uriBuilder.clone().path(book.getISBN()).path("publisher").build().toString(), "Publisher")
+            .addLink("authorship", resourcePath + "search/author?q=" + book.getAuthor(), "Books by this author");
+
+
+        return null;
+    }
+
+    private CollectionJson.Item publisherToItem(final Book book) {
+        return null;
+    }
+
 }
