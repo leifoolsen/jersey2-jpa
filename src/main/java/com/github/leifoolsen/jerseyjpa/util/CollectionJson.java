@@ -57,7 +57,7 @@ public class CollectionJson {
             this.href = href;
         }
         public Collection addLink(Link link) {
-            if(link == null) links = new ArrayList<>();
+            if(links == null) links = new ArrayList<>();
             links.add(link);
             return this;
         }
