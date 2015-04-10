@@ -31,7 +31,7 @@ public class BookDTO {
     @FormParam("summary")
     public String summary;
 
-    @FormParam("publisher-code")
+    @FormParam("publisher.code")
     public String publisherCode;
 
     public BookDTO() {}

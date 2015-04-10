@@ -188,7 +188,7 @@ public class BookResourceTest {
                     "prohibitions are bogus and can be cheerfully disregarded. ACCIDENCE WILL HAPPEN is an " +
                     "authoritative and deeply reassuring guide to grammar, style and the linguistic conundrums " +
                     "we all face.")
-            .param("publisher-code", "02978");
+            .param("publisher.code", "02978");
 
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
