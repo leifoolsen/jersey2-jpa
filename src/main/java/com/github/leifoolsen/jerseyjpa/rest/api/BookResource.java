@@ -178,6 +178,12 @@ public class BookResource {
         return resourceContext.getResource(SearchResource.class);
     }
 
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("count")
+    public Long count() {
+        return repository.countBooks();
+    }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)

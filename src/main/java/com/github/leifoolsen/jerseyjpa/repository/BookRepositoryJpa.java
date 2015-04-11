@@ -74,6 +74,10 @@ public class BookRepositoryJpa {
         repository.remove(Book.class, id);
     }
 
+    public Long countBooks() {
+        return repository.count(Book.class);
+    }
+
     public List<Book> findBooks(final Integer offset, final Integer limit) {
         return repository.find(Book.class, offset, limit);
     }

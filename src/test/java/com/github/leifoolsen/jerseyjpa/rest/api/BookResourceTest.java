@@ -31,6 +31,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -515,7 +516,8 @@ public class BookResourceTest {
     }
 
     @Test
-    public void paginate() {
+    public void paginateTroughAllBooks() {
+
         Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/any")
@@ -530,7 +532,8 @@ public class BookResourceTest {
         assertThat(collectionJson.collection().links(), hasSize(greaterThan(0)));
         assertThat(collectionJson.collection().links("next"), hasSize(greaterThan(0)));
 
-        int count = 1;
+        int bookCount = collectionJson.collection().items().size();
+        int pageCount = 1;
         while(collectionJson.collection().links("next").size() > 0) {
 
             String s1 = target.getUri().toString();
@@ -548,12 +551,23 @@ public class BookResourceTest {
 
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
             collectionJson = response.readEntity(CollectionJson.class);
-
-            count++;
+            bookCount +=  collectionJson.collection().items().size();
+            pageCount++;
         }
 
-        assertThat(count, greaterThan(1));
-        //logger.debug(collectionJson.toString());
+        assertThat(pageCount, greaterThan(1));
+
+        response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("count")
+                .request(MediaType.TEXT_PLAIN)
+                .accept(MediaType.TEXT_PLAIN_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Long n = response.readEntity(Long.class);
+
+        assertThat(n, equalTo(Long.valueOf(bookCount)));
     }
 
 

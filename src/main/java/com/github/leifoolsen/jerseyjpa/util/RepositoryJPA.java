@@ -348,7 +348,7 @@ public class RepositoryJPA implements Repository {
     public <T> long count(final Class<T> entityClass) {
         final String entityName = entityName(entityClass);
         final Long result = (Long) getEntityManager()
-                .createQuery("select count(*) from " + entityName)
+                .createQuery("select count(e) from " + entityName + " e")
                 .getSingleResult();
 
         return result.intValue();
