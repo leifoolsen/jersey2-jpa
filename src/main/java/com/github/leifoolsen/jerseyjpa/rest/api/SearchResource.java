@@ -4,8 +4,10 @@ import com.github.leifoolsen.jerseyjpa.constraint.SearchType;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.repository.BookRepositoryJpa;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
+import com.github.leifoolsen.jerseyjpa.util.CollectionJson;
 import com.github.leifoolsen.jerseyjpa.util.DatabaseConnection;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -27,6 +28,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class SearchResource {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final int DEFAULT_LIMIT = 20;
 
     private JpaDatabaseConnectionManager.JpaDatabaseConnection connection = DatabaseConnection.getConnection();
     private BookRepositoryJpa repository = new BookRepositoryJpa(connection);
@@ -46,25 +48,38 @@ public class SearchResource {
             @QueryParam("offset") final Integer offset,
             @QueryParam("limit") final Integer limit) {
 
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
+        Integer off = Math.max(MoreObjects.firstNonNull(offset, 0), 0);            // At least zero
+        Integer lim = Math.max(MoreObjects.firstNonNull(limit, DEFAULT_LIMIT), 1); // Greater than zero
 
-        if(searchValue != null) { uriBuilder.queryParam("q", searchValue); }
-        if(offset      != null) { uriBuilder.queryParam("offset", offset); }
-        if(limit       != null) { uriBuilder.queryParam("limit", limit); }
+        List<Book> books = repository.findBooksBySearchType(SearchType.Type.get(searchType), searchValue, off, lim);
 
-        List<Book> books = repository.findBooksBySearchType(SearchType.Type.get(searchType), searchValue, offset, limit);
+        CollectionJson collectionJson = CollectionJsonResourceHelper.buildCollectionJson(uriInfo, books);
 
-        if(books.size() < 1) {
-            return Response
-                    .noContent()
-                    .location(uriBuilder.build())
-                    .build();
+        UriBuilder rootUriBuilder = CollectionJsonResourceHelper
+                .resourceRootUriBuilder(uriInfo)
+                .path("search")
+                .path(searchType);
+
+        if(searchValue != null) {
+            rootUriBuilder.queryParam("q", searchValue);
         }
-
-        GenericEntity<List<Book>> entities = new GenericEntity<List<Book>>(books){};
+        if(off > 0) {
+            int pOffset = Math.max(off - lim, 0);
+            collectionJson.collection().addLink(
+                    "prev", rootUriBuilder.clone()
+                            .queryParam("offset", pOffset)
+                            .queryParam("limit", lim).toString());
+        }
+        if(books.size() >= lim) {
+            int nOffset = off + lim;
+            collectionJson.collection().addLink(
+                    "next", rootUriBuilder.clone()
+                            .queryParam("offset", nOffset)
+                            .queryParam("limit", lim).toString());
+        }
         return Response
-                .ok(entities)
-                .location(uriBuilder.build())
+                .ok(collectionJson)
+                .location(uriInfo.getRequestUri())
                 .build();
     }
 

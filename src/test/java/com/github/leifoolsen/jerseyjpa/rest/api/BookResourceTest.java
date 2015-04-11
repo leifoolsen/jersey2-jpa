@@ -8,6 +8,8 @@ import com.github.leifoolsen.jerseyjpa.rest.exception.ErrorMessage;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.GZIPReaderInterceptor;
 import com.github.leifoolsen.jerseyjpa.util.CollectionJson;
 import com.github.leifoolsen.jerseyjpa.util.DomainPopulator;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -20,17 +22,18 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -125,6 +128,13 @@ public class BookResourceTest {
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        Publisher publisher = collectionJson.collection().item(0).unMarshalData(Publisher.class);
+        assertNotNull(publisher);
+
+        //logger.debug(collectionJson.toString());
     }
 
 
@@ -151,6 +161,13 @@ public class BookResourceTest {
                 .post(Entity.entity(book, MediaType.APPLICATION_JSON_TYPE));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        Book b = collectionJson.collection().item(0).unMarshalData(Book.class);
+        assertEquals(book.getISBN(), b.getISBN());
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
@@ -196,6 +213,13 @@ public class BookResourceTest {
                 .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        Book b = collectionJson.collection().item(0).unMarshalData(Book.class);
+        assertEquals(form.asMap().getFirst("isbn"), b.getISBN());
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
@@ -217,7 +241,7 @@ public class BookResourceTest {
 
 
     @Test
-    public void newBookWithNonExisingPublisherShouldReturn_BAD_REQUEST() {
+    public void newBookWithUnknownPublisherShouldReturn_BAD_REQUEST() {
 
         final Publisher nonExistingPublisher = new Publisher("22222", "Does not exist");
         final Book book = Book
@@ -268,8 +292,13 @@ public class BookResourceTest {
                 .put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        Book b = response.readEntity(Book.class);
-        assertThat(b.getTitle(), equalTo("Vredens druer"));
+
+        collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        Book b = collectionJson.collection().item(0).unMarshalData(Book.class);
+        assertEquals(form.asMap().getFirst("isbn"), b.getISBN());
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
@@ -363,53 +392,62 @@ public class BookResourceTest {
 
 
     @Test
-    public void allBooksLimitToFiveItemsShouldReturn_OK() {
+    public void allBooksLimitToFiveItemsShouldReturn5() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
-                .queryParam("offset", 0)
+                .queryParam("offset", 5)
                 .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
-        assertThat(result, hasSize(5));
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(5));
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
-    public void searchAnyBookLimitToFiveItemsShouldReturn_OK() {
+    public void searchAnyBookLimitToFiveItemsShouldReturn5() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/any")
-                .queryParam("offset", 0)
+                .queryParam("offset", 5)
                 .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {} );
-        assertThat(result, hasSize(5));
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(5));
+
+        //logger.debug(collectionJson.toString());
+
     }
 
     @Test
-    public void searchByIsbnShouldReturn_OK() {
+    public void searchByIsbnShouldReturnAtLeastOneItem() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/isbn")
                 .queryParam("q", "9788")
+                .queryParam("offset", 0)
+                .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {} );
-        assertThat(result, hasSize(greaterThan(0)));
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(greaterThan(0)));
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
-    public void searchByPublisherNameShouldReturn_OK() {
+    public void searchByPublisherNameShouldReturnAtLeastOneItem() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/publisher.name")
@@ -419,12 +457,14 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {} );
-        assertThat(result, hasSize(greaterThan(0)));
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(greaterThan(0)));
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
-    public void searchByAuthorShouldReturn_OK() {
+    public void searchByAuthorShouldReturnAtLeastOneItem() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/author")
@@ -434,12 +474,14 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
-        assertThat(result, hasSize(greaterThan(0)));
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(greaterThan(0)));
+
+        //logger.debug(collectionJson.toString());
     }
 
     @Test
-    public void searchAnyBookWithTextHawkingShouldReturn_OK() {
+    public void searchAnyBookWithTextHawkingShouldReturnAtLeastOneItem() {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .path("search/any")
@@ -449,9 +491,71 @@ public class BookResourceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        final List<Book> result = response.readEntity(new GenericType<List<Book>>() {});
-        assertThat(result, hasSize(greaterThan(1)));
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(greaterThan(0)));
+
+        //logger.debug(collectionJson.toString());
     }
+
+    @Test
+    public void searchWithNotHitsShouldeturnEmptyItems() {
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/any")
+                .queryParam("q", "Abby lane, binke bane, ole dole doff!")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), is(empty()));
+
+        //logger.debug(collectionJson.toString());
+    }
+
+    @Test
+    public void paginate() {
+        Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .path("search/any")
+                .queryParam("offset", 0)
+                .queryParam("limit", 5)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().links(), hasSize(greaterThan(0)));
+        assertThat(collectionJson.collection().links("next"), hasSize(greaterThan(0)));
+
+        int count = 1;
+        while(collectionJson.collection().links("next").size() > 0) {
+
+            String s1 = target.getUri().toString();
+            String s2 = collectionJson.collection().links("next").get(0).href();
+            String s3 = Lists.newArrayList(Splitter.on(s1).omitEmptyStrings().trimResults().split(s2)).get(0);
+
+            URI uri = URI.create(s3);
+            Map<String, String> map = Splitter.on('&').omitEmptyStrings().withKeyValueSeparator('=').split(uri.getQuery());
+
+            WebTarget t = target.path(uri.getPath());
+            for (String key: map.keySet()) {
+                t = t.queryParam(key, map.get(key));
+            }
+            response = t.request(MediaType.APPLICATION_JSON_TYPE).get();
+
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            collectionJson = response.readEntity(CollectionJson.class);
+
+            count++;
+        }
+
+        assertThat(count, greaterThan(1));
+        //logger.debug(collectionJson.toString());
+    }
+
 
     @Test
     public void headerShouldContainContentEncodingGzipAndContentTypeUtf8() {

@@ -13,7 +13,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class CollectionJsonTest {
 
@@ -116,10 +118,10 @@ public class CollectionJsonTest {
         TestDTO testDTO = new TestDTO("1", "foo", "bar", "baz");
         CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
         CollectionJson.Template template = new CollectionJson.Template();
-        template.addData("id", testDTO.id)
-                .addData("foo", testDTO.foo)
-                .addData("bar", testDTO.bar)
-                .addData("baz", testDTO.baz);
+        template.addData("id", testDTO.id, "Id")
+                .addData("foo", testDTO.foo, "The foo")
+                .addData("bar", testDTO.bar, "The bar")
+                .addData("baz", testDTO.baz, "The baz");
         collectionJson.collection().addTemplate(template);
         TestDTO dto = collectionJson.collection().template().unMarshalData(TestDTO.class);
 
@@ -134,10 +136,10 @@ public class CollectionJsonTest {
         CollectionJson collectionJson = CollectionJson.newTemplate();
 
         collectionJson.template()
-                .addData("id", testDTO.id)
-                .addData("foo", testDTO.foo)
-                .addData("bar", testDTO.bar)
-                .addData("baz", testDTO.baz);
+                .addData("id", testDTO.id, null)
+                .addData("foo", testDTO.foo, null)
+                .addData("bar", testDTO.bar, null)
+                .addData("baz", testDTO.baz, null);
 
 
         TestDTO dto = collectionJson.template().unMarshalData(TestDTO.class);
@@ -210,10 +212,10 @@ public class CollectionJsonTest {
 
 
         CollectionJson.Template template = new CollectionJson.Template();
-        template.addData("id", dto1.id)
-                .addData("foo", dto1.foo)
-                .addData("bar", dto1.bar)
-                .addData("baz", dto1.baz);
+        template.addData("id", dto1.id, "Id")
+                .addData("foo", dto1.foo, "The Foo")
+                .addData("bar", dto1.bar, "The bar")
+                .addData("baz", dto1.baz, "The baz");
         collectionJson.collection().addTemplate(template);
 
 
@@ -269,5 +271,4 @@ public class CollectionJsonTest {
                     '}';
         }
     }
-
 }

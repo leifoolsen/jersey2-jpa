@@ -10,7 +10,6 @@ import com.github.leifoolsen.jerseyjpa.rest.dto.BookDTO;
 import com.github.leifoolsen.jerseyjpa.rest.interceptor.Compress;
 import com.github.leifoolsen.jerseyjpa.util.CollectionJson;
 import com.github.leifoolsen.jerseyjpa.util.DatabaseConnection;
-import com.github.leifoolsen.jerseyjpa.util.DateAdapter;
 import com.github.leifoolsen.jerseyjpa.util.JpaDatabaseConnectionManager;
 import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import org.slf4j.Logger;
@@ -33,9 +32,7 @@ import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.net.URI;
 
 @Singleton
 @Path(BookResource.RESOURCE_PATH)
@@ -66,11 +63,9 @@ public class BookResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response create(@BeanParam final BookDTO params) {
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(params.isbn);
-        Response.ResponseBuilder responseBuilder;
 
         Publisher publisher = lookupPublisher(params.publisherCode);
-        Book bookToCreate = Book
+        Book book = Book
                 .with(params.isbn)
                 .title(params.title)
                 .author(params.author)
@@ -80,11 +75,14 @@ public class BookResource {
                 .publisher(publisher)
                 .build();
 
-        bookToCreate = repository.newBook(bookToCreate);
-        responseBuilder = Response.created(uriBuilder.build()).entity(bookToCreate);
-        logger.debug("Created book with ISBN: {}. Title: {}", bookToCreate.getISBN(), bookToCreate.getTitle());
+        book = repository.newBook(book);
+        logger.debug("Created book with ISBN: {}. Title: {}", book.getISBN(), book.getTitle());
 
-        return responseBuilder.build();
+        CollectionJson collectionJson = CollectionJsonResourceHelper.buildCollectionJson(uriInfo, book);
+        return Response
+                .created(uriInfo.getRequestUri())
+                .entity(collectionJson)
+                .build();
     }
 
     @PUT
@@ -96,8 +94,6 @@ public class BookResource {
     @PUT
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response update(@BeanParam final BookDTO params) {
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone().path(params.isbn);
-        Response.ResponseBuilder responseBuilder;
 
         Publisher publisher = lookupPublisher(params.publisherCode);
         Book bookToUpdate = Book
@@ -112,34 +108,27 @@ public class BookResource {
 
         Book updatedBook = repository.updateBook(bookToUpdate);
         logger.debug("Updated book with ISBN: {} and title: {}", bookToUpdate.getISBN(), bookToUpdate.getTitle());
-        responseBuilder = Response.ok(updatedBook).location(uriBuilder.build());
-        return responseBuilder.build();
-    }
 
-    private Publisher lookupPublisher(final String publisherCode) {
-
-        Publisher publisher = null;
-        String p = StringUtil.blankToNull(publisherCode);
-        if(p != null) {
-            publisher = repository.findPublisherByCode(publisherCode);
-
-            if (publisher == null) {
-                throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
-                        "Can not create or update book. Publisher with code " + publisherCode + " was not found", null);
-            }
-        }
-        return publisher;
+        CollectionJson collectionJson = CollectionJsonResourceHelper.buildCollectionJson(uriInfo, updatedBook);
+        return Response
+                .ok(collectionJson)
+                .location(uriInfo.getRequestUri())
+                .build();
     }
 
     @DELETE
     @Path("{isbn}")
-    public void delete(@PathParam("isbn") @Isbn final String isbn) {
+    public Response delete(@PathParam("isbn") @Isbn final String isbn) {
+
         Book book = repository.findBookByISBN(isbn);
         if(book != null) {
             repository.deleteBook(book);
             logger.debug("Book with isbn: '{}' deleted", isbn);
         }
-        // void method returns Response.Status.NO_CONTENT
+        return Response
+                .noContent()
+                .location(uriInfo.getRequestUri())
+                .build();
     }
 
 
@@ -151,40 +140,26 @@ public class BookResource {
         if (book == null) {
             throw new WebApplicationException("Book with isbn: '"+ isbn + "' was not found",
                     Response.status(Response.Status.NOT_FOUND)
-                            .location(uriInfo.getAbsolutePath())
+                            .location(uriInfo.getRequestUri())
                             .build()
             );
         }
-
-
-        String resourcePath = uriInfo.getRequestUriBuilder().toString().replace("9781846883668", "");
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", resourcePath);
-
-        CollectionJson.Item item = new CollectionJson.Item(uriInfo.getRequestUriBuilder().toString());
-        item.addData("id", book.getId(), "Id")
-            .addData("version", book.getVersion().toString(), "Version")
-            .addData("isbn",           book.getISBN(), "ISBN")
-            .addData("title",          book.getTitle(), "Title")
-            .addData("author",         book.getAuthor(), "Author")
-            .addData("published", DateAdapter.dateToString(book.getPublished()), "Published")
-            .addData("summary",        book.getSummary(), "Summary")
-            .addData("publisher.code", book.getPublisher().getCode(), "Publisher code");
-        item.addLink("publisher",      uriInfo.getRequestUriBuilder().path("publisher").build().toString(), "Publisher")
-            .addLink("authorship",     resourcePath + "search/author?q=" + book.getAuthor(), "Books by this author");
-
-        collectionJson.collection().addItem(item);
-
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().clone();
-        Response.ResponseBuilder responseBuilder = Response.ok(collectionJson).location(uriBuilder.build());
-        return responseBuilder.build();
-
+        CollectionJson collectionJson = CollectionJsonResourceHelper.buildCollectionJson(uriInfo, book);
+        return Response
+                .ok(collectionJson)
+                .location(uriInfo.getRequestUri())
+                .build();
     }
 
     @GET
     @Path("{isbn}/publisher")
-    public Publisher publisherOfBook(@Isbn @PathParam("isbn") final String isbn) {
+    public Response publisherOfBook(@Isbn @PathParam("isbn") final String isbn) {
         final Book book = repository.findBookByISBN(isbn);
-        return book.getPublisher();
+        CollectionJson collectionJson = CollectionJsonResourceHelper.buildCollectionJson(uriInfo, book.getPublisher());
+        return Response
+                .ok(collectionJson)
+                .location(uriInfo.getRequestUri())
+                .build();
     }
 
     @GET
@@ -193,8 +168,9 @@ public class BookResource {
         // Calling SearchResource directly is a hack, I think, but don't know how to do it otherwise
         // @GET'ing like this: "/books/search" will hit the byIsbn method,
         // so this method is needed to get all items without searchparams.
-        return resourceContext.getResource(
-                SearchResource.class).allBooks(SearchType.Type.ANY.type(), null, offset, limit);
+
+        String q = uriInfo.getQueryParameters().getFirst("q");
+        return resourceContext.getResource(SearchResource.class).allBooks(SearchType.Type.ANY.type(), q, offset, limit);
     }
 
     @Path("search/{searchType}")
@@ -211,36 +187,17 @@ public class BookResource {
     }
 
 
-    private CollectionJson.Item bookToItem(final Book book) {
+    private Publisher lookupPublisher(final String publisherCode) {
+        Publisher publisher = null;
+        String p = StringUtil.blankToNull(publisherCode);
+        if(p != null) {
+            publisher = repository.findPublisherByCode(publisherCode);
 
-        URI baseUri = uriInfo.getBaseUri();
-        String path = BookResource.class.getAnnotation(Path.class).value();
-        UriBuilder uriBuilder = UriBuilder.fromUri(baseUri).path(path); // e.g. http://example.org/api/books
-
-
-        String resourcePath = uriInfo.getRequestUriBuilder().toString().replace(book.getISBN(), "");
-        //UriBuilder uriBuilder = UriBuilder.fromPath(resourcePath);
-
-
-        CollectionJson.Item item = new CollectionJson.Item(uriInfo.getRequestUriBuilder().toString());
-        item.addData("id", book.getId(), "Id")
-            .addData("version", book.getVersion().toString(), "Version")
-            .addData("isbn", book.getISBN(), "ISBN")
-            .addData("title", book.getTitle(), "Title")
-            .addData("author", book.getAuthor(), "Author")
-            .addData("published", DateAdapter.dateToString(book.getPublished()), "Published")
-            .addData("summary", book.getSummary(), "Summary")
-            .addData("publisher.code", book.getPublisher().getCode(), "Publisher code");
-        item.addLink("self", uriBuilder.clone().path(book.getISBN()).path("publisher").build().toString(), "Publisher")
-            .addLink("publisher", uriBuilder.clone().path(book.getISBN()).path("publisher").build().toString(), "Publisher")
-            .addLink("authorship", resourcePath + "search/author?q=" + book.getAuthor(), "Books by this author");
-
-
-        return null;
+            if (publisher == null) {
+                throw new ApplicationException(Response.Status.BAD_REQUEST.getStatusCode(), null,
+                        "Can not create or update book. Publisher with code " + publisherCode + " was not found", null);
+            }
+        }
+        return publisher;
     }
-
-    private CollectionJson.Item publisherToItem(final Book book) {
-        return null;
-    }
-
 }

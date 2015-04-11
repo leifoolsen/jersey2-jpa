@@ -44,6 +44,8 @@ public class Publisher {
 
     public String getId() { return id; }
 
+    public Long getVersion() { return version; }
+
     public String getCode() { return code; }
 
     public String getName() { return name; }

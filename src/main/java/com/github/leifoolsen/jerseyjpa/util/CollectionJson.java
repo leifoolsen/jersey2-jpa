@@ -16,6 +16,21 @@ import java.util.Map;
 /*
     Implemention of mediatype "collection+json". See: http://amundsen.com/media-types/collection/
 
+    Sample collection object
+
+    { "collection" :
+      {
+        "version" : "1.0",
+        "href" : URI,
+        "links" : [ARRAY],
+        "items" : [ARRAY],
+        "queries" : [ARRAY],
+        "template" : {OBJECT},
+        "error" : {OBJECT}
+      }
+    }
+
+
     A minimal Collection+JSON document. All responses MUST contain at least a valid collection object.
 
     { "collection" :
@@ -128,13 +143,13 @@ public class CollectionJson {
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Collection {
-        private String version;
-        private String href;
-        private List<Link> links;
-        private List<Item> items;
-        private List<Query> queries;
-        private Template template;
-        private Error error;
+        private String      version;
+        private String      href;
+        private List<Link>  links   = new ArrayList<>();
+        private List<Item>  items   = new ArrayList<>();
+        private List<Query> queries = new ArrayList<>();
+        private Template    template;
+        private Error       error;
 
         protected Collection() {}
         protected Collection(String version, String href) {
@@ -145,18 +160,23 @@ public class CollectionJson {
             return addLink(new Link(rel, href));
         }
         public Collection addLink(Link link) {
-            if(links == null) links = new ArrayList<>();
             links.add(link);
             return this;
         }
         public Collection addItem(Item item) {
-            if(items == null) items = new ArrayList<>();
             items.add(item);
             return this;
         }
-        public Collection addQuery(Query query) {
-            if(queries == null) queries = new ArrayList<>();
-            queries.add(query);
+        public Collection addQuery(Query q) {
+            queries.add(q);
+            return this;
+        }
+        public Collection addQueries(List<Query> qs) {
+            if(qs != null) {
+                for(Query q : qs) {
+                    queries.add(q);
+                }
+            }
             return this;
         }
         public Collection addTemplate(Template template) {
@@ -175,6 +195,15 @@ public class CollectionJson {
         }
         public List<Link> links() {
             return links;
+        }
+        public List<Link> links(String rel) {
+            List<Link> result = new ArrayList<>();
+            for (Link link : links) {
+                if(link.rel.equals(rel)) {
+                    result.add(link);
+                }
+            }
+            return result;
         }
         public List<Item> items() {
             return items;
@@ -341,6 +370,37 @@ public class CollectionJson {
         }
     }
 
+
+    /*
+        The links array is an OPTIONAL child property of the items array. It SHOULD contain one or more anonymous
+        objects. Each has five possible properties: href (REQUIRED), rel (REQURIED), name (OPTIONAL), render (OPTIONAL),
+         and prompt, (OPTIONAL).
+
+        Sample links array:
+
+        {
+          "collection" :
+          {
+            "version" : "1.0",
+            "href" : URI,
+            "items" :
+            [
+              {
+                "href" : URI,
+                "data" : [ARRAY],
+                "links" :
+                [
+                  {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING, "render" : "image"},
+                  {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING, "render" : "link"},
+                  ...
+                  {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING}
+                ]
+              }
+            ]
+          }
+        }
+    */
+
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ItemLink {
@@ -367,6 +427,19 @@ public class CollectionJson {
 
 
     /*
+        The template object contains all the input elements used to add or edit collection "records." This is an
+        OPTIONAL object and there MUST NOT be more than one template object in a Collection+JSON document.
+        It is a top-level document property.
+
+        The template object SHOULD have a data array child property.
+        {
+          "template" :
+          {
+            "data" : [ARRAY]
+          }
+        }
+
+
         Template Representation:
         To reduce the size of the response representation, servers MAY return a link to the template object for a
         collection. Clients can then request the template representation directly.
@@ -408,9 +481,9 @@ public class CollectionJson {
         private List<TemplateData> data;
 
         public Template() {}
-        public Template addData(String name, String value) {
+        public Template addData(String name, String value, String prompt) {
             if(data == null) data = new ArrayList<>();
-            data.add(new TemplateData(name, value));
+            data.add(new TemplateData(name, value, prompt));
             return this;
         }
 
@@ -439,15 +512,41 @@ public class CollectionJson {
     public static class TemplateData {
         private String name;
         private String value;
+        private String prompt;
 
         protected TemplateData() {}
-        protected TemplateData(String name, String value) {
+        protected TemplateData(String name, String value, String prompt) {
             this.name = name;
             this.value = value;
+            this.prompt = prompt;
         }
     }
 
     /*
+        The queries array is an OPTIONAL top-level property of the Collection+JSON document.
+
+        The queries array SHOULD contain one or more anonymous objects. Each object composed of five possible
+        properties: href (REQUIRED), rel (REQUIRED), name (OPTIONAL), prompt (OPTIONAL), and a data array (OPTIONAL).
+
+        If present, the data array represents query parameters for the associated href property of the same object.
+        See Query Templates for details.
+
+        {
+          "queries" :
+          [
+            {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING},
+            {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING,
+              "data" :
+              [
+                {"name" : STRING, "value" : VALUE}
+              ]
+            },
+            ...
+            {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING}
+          ]
+        }
+
+
         Queries Representation:
         To reduce the size of the response representation, servers MAY return a link to the queries array for a
         collection. Clients can then request the queries representation directly.
@@ -504,6 +603,22 @@ public class CollectionJson {
 
 
     /*
+        The error object contains addiitional information on the latest error condition reported by the server.
+        This is an OPTIONAL object and there MUST NOT be more than one error object in a Collection+JSON document.
+        It is a top-level document property.
+
+        The following elements MAY appear as child properties of the error object: code message and title.
+
+        {
+          "error" :
+          {
+            "title" : STRING,
+            "code" : STRING,
+            "message" : STRING
+          }
+        }
+
+
         Error Representation:
         When the server encounters an error, it MAY return an error object.
 
@@ -543,6 +658,7 @@ public class CollectionJson {
         public String message() {
             return message;
         }
+
         public <T> T unMarshalError(final Class<T> entityClass) {
             JsonBuilderFactory factory = Json.createBuilderFactory(null);
             JsonObjectBuilder builder = factory.createObjectBuilder()
