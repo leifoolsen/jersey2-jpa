@@ -1,6 +1,6 @@
 #Jersey-2, MOXy, JPA-2, Embedded Jetty
 Maven project demonstrating how to run a JAX-RS 2 project in Embedded Jetty-9 with Servlet-3.1 annotation based configuration,
-using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence.
+using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence. Responses are returned as Collection+JSON.
 
 ## Features implemented
 * @WebServlet
@@ -21,6 +21,12 @@ using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence.
     * Constructor injection of UriInfo and ResourceContext
 * @BeanParam
     * To inject parameters from Form POST and PUT
+* Collection+JSON - Document Format
+    * 200 (OK) and 201 (CREATED) responses are returned as Collection+JSON hypermedia-type
+    * Not yet completed:
+        * Profile Media-Type Parameter: @Produces/@Consumes("application/vnd.collection+json")
+        * @POST and @PUT using Collection+JSON format  
+        * Return Error using Collection+JSON format
 * Embedded database
     * H2 or HSQL
 * JPA provider    
