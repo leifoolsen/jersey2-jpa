@@ -533,6 +533,8 @@ public class BookResourceTest {
         assertThat(collectionJson.collection().links("next"), hasSize(greaterThan(0)));
 
         int bookCount = collectionJson.collection().items().size();
+
+        // Paginate forward
         int pageCount = 1;
         while(collectionJson.collection().links("next").size() > 0) {
 
@@ -567,7 +569,31 @@ public class BookResourceTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Long n = response.readEntity(Long.class);
 
-        assertThat(n, equalTo(Long.valueOf(bookCount)));
+        assertThat(n, equalTo((long) bookCount));
+
+        // Paginate back
+        pageCount = 1;
+        while(collectionJson.collection().links("prev").size() > 0) {
+
+            String s1 = target.getUri().toString();
+            String s2 = collectionJson.collection().links("prev").get(0).href();
+            String s3 = Lists.newArrayList(Splitter.on(s1).omitEmptyStrings().trimResults().split(s2)).get(0);
+
+            URI uri = URI.create(s3);
+            Map<String, String> map = Splitter.on('&').omitEmptyStrings().withKeyValueSeparator('=').split(uri.getQuery());
+
+            WebTarget t = target.path(uri.getPath());
+            for (String key: map.keySet()) {
+                t = t.queryParam(key, map.get(key));
+            }
+            response = t.request(MediaType.APPLICATION_JSON_TYPE).get();
+
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            collectionJson = response.readEntity(CollectionJson.class);
+            pageCount++;
+        }
+
+        assertThat(pageCount, greaterThan(1));
     }
 
 
