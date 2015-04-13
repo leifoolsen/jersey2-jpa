@@ -20,7 +20,7 @@ import java.io.IOException;
         filterName = "JPA-Filter",
         description = "JPA Session in View Filter"
 )
-public class JerseyJpaFilter  implements Filter {
+public class JpaFilter implements Filter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private JpaDatabaseConnectionManager.JpaDatabaseConnection connection;

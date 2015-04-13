@@ -9,7 +9,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 @WebListener
-public class JerseyJpaListener implements ServletContextListener {
+public class ExampleListener implements ServletContextListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
