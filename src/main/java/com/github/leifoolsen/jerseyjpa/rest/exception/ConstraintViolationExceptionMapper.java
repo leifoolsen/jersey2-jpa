@@ -32,7 +32,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
         return Response
                 .status(errorMessage.getResponseStatusCode())
                 .entity(errorMessage)
-                .location(uriInfo.getAbsolutePath())
+                .location(uriInfo.getRequestUri()) // uriInfo.getAbsolutePath()
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }

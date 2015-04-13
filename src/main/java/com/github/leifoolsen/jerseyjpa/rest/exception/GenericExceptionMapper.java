@@ -30,7 +30,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
         return Response
                 .status(errorMessage.getResponseStatusCode())
                 .entity(errorMessage)
-                .location(uriInfo.getAbsolutePath())
+                .location(uriInfo.getRequestUri()) // uriInfo.getAbsolutePath()
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
