@@ -80,7 +80,7 @@ public class BookResource {
 
         CollectionJson collectionJson = CollectionJsonResourceHelper.buildCollectionJson(uriInfo, book);
         return Response
-                .created(uriInfo.getRequestUri())
+                .created(uriInfo.getAbsolutePathBuilder().clone().path(params.isbn).build())
                 .entity(collectionJson)
                 .build();
     }
@@ -118,17 +118,15 @@ public class BookResource {
 
     @DELETE
     @Path("{isbn}")
-    public Response delete(@PathParam("isbn") @Isbn final String isbn) {
+    public void delete(@PathParam("isbn") @Isbn final String isbn) {
 
         Book book = repository.findBookByISBN(isbn);
         if(book != null) {
             repository.deleteBook(book);
             logger.debug("Book with isbn: '{}' deleted", isbn);
         }
-        return Response
-                .noContent()
-                .location(uriInfo.getRequestUri())
-                .build();
+
+        // void method returns NO_CONTENT (204) response
     }
 
 
