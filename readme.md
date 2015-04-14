@@ -2,6 +2,22 @@
 Maven project demonstrating how to run a JAX-RS 2 project in Embedded Jetty-9 with Servlet-3.1 annotation based configuration,
 using Jersey-2 with JSON binding via MOXy, and JPA-2 persistence. Responses are returned as Collection+JSON.
 
+## The Example domain
+```Book ----> Publisher```
+
+## The API
+```
+/api/books
+/api/books/{isbn}
+/api/books/{isbn}/publisher
+/api/books/search/isbn
+/api/books/search/title
+/api/books/search/author
+/api/books/search/summary
+/api/books/search/publisher.code
+/api/books/search/publisher.name
+/api/books/search/any
+```
 ## Features implemented
 * @WebServlet
     * Setting base uri using @ApplicationPath
