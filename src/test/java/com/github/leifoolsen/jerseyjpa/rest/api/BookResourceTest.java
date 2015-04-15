@@ -172,6 +172,36 @@ public class BookResourceTest {
     }
 
     @Test
+    public void newBookPostWithJsonStringShouldReturn_CREATED() {
+
+        final Publisher publisher = DomainPopulator.getPublishers().get(DomainPopulator.CAPPELEN_DAMM);
+        String jsonBook =
+                "{" +
+                " 'isbn' : '9990297871935'" +
+                ", 'publisher' : { 'code': '02978' } " +
+                ", 'title' : 'Accidence Will Happen 2: The Non-Pedantic Guide to English Usage'" +
+                ", 'author' : 'Kamm, Oliver'" +
+                ", 'published' : '2015-02-12'" +
+                ", 'summary' : 'Are standards of English alright - or should that be all right? To knowingly ...'" +
+                "}";
+        jsonBook = jsonBook.replace('\'', '"');
+
+        final Response response = target
+                .path(BookResource.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(jsonBook, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+        CollectionJson collectionJson = response.readEntity(CollectionJson.class);
+        assertThat(collectionJson.collection().items(), hasSize(1));
+        Book b = collectionJson.collection().item(0).unMarshalData(Book.class);
+        assertEquals("9990297871935", b.getISBN());
+
+        //logger.debug(collectionJson.toString());
+    }
+
+    @Test
     public void newBookWithDuplicateIsbnShouldReturn_CONFLICT() {
 
         final Book book = Book.with(ISBN_DUPLICATE)
