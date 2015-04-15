@@ -113,6 +113,7 @@ import java.util.Map;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CollectionJson {
+    public static final String COLLECTION_JSON_VERSION = "1.0";
     public static final String MEDIA_TYPE_COLLECTION_JSON = "application/vnd.collection+json";
     public static final MediaType MEDIA_TYPE = MediaType.valueOf(MEDIA_TYPE_COLLECTION_JSON);
 
@@ -123,8 +124,8 @@ public class CollectionJson {
     protected CollectionJson(Collection collection) { this.collection = collection; }
     protected CollectionJson(Template template) { this.template = template; }
 
-    public static CollectionJson newCollection(final String version, final String href) {
-        return new CollectionJson(new Collection(version, href));
+    public static CollectionJson newCollection(final String href) {
+        return new CollectionJson(new Collection(href));
     }
 
     public static CollectionJson newTemplate() {
@@ -143,17 +144,16 @@ public class CollectionJson {
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Collection {
-        private String      version;
-        private String      href;
-        private List<Link>  links   = new ArrayList<>();
-        private List<Item>  items   = new ArrayList<>();
-        private List<Query> queries = new ArrayList<>();
-        private Template    template;
-        private Error       error;
+        private final String version = COLLECTION_JSON_VERSION;
+        private String       href;
+        private List<Link>   links   = new ArrayList<>();
+        private List<Item>   items   = new ArrayList<>();
+        private List<Query>  queries = new ArrayList<>();
+        private Template     template;
+        private Error        error;
 
         protected Collection() {}
-        protected Collection(String version, String href) {
-            this.version = version;
+        protected Collection(String href) {
             this.href = href;
         }
         public Collection addLink(String rel, String href) {

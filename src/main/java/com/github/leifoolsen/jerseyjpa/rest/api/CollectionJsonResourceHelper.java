@@ -52,7 +52,7 @@ public class CollectionJsonResourceHelper {
     }
 
     public static CollectionJson buildCollectionJson(final UriInfo uriInfo) {
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", uriInfo.getRequestUri().toString());
+        CollectionJson collectionJson = CollectionJson.newCollection(uriInfo.getRequestUri().toString());
         collectionJson.collection().addQueries(collectionJsonQueries(uriInfo));
         return collectionJson;
     }

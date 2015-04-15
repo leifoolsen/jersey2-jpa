@@ -23,7 +23,7 @@ public class CollectionJsonTest {
 
     @Test
     public void minimalCollection() {
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
         assertThat(collectionJson.collection().version(), equalTo("1.0"));
         assertThat(collectionJson.collection().href(), equalTo("http://example.org/friends/"));
 
@@ -34,7 +34,7 @@ public class CollectionJsonTest {
     public void itemRepresentation() {
         TestDTO testDTO = new TestDTO("1", "foo", "bar", "baz");
 
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
 
         collectionJson.collection()
                 .addLink("feed", "http://example.org/friends/rss")
@@ -67,7 +67,7 @@ public class CollectionJsonTest {
         TestDTO dto1 = new TestDTO("1", "foo", "bar", "baz");
         TestDTO dto2 = new TestDTO("2", "ole", "dole", "doff");
 
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
 
         collectionJson.collection()
                 .addLink("feed", "http://example.org/friends/rss")
@@ -104,7 +104,7 @@ public class CollectionJsonTest {
 
     @Test
     public void queriesRepresentation() {
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
         CollectionJson.Query q = new CollectionJson.Query("search", "http://example.org/friends/search", "Search");
         q.addQueryData("search", "");
         collectionJson.collection().addQuery(q);
@@ -116,7 +116,7 @@ public class CollectionJsonTest {
     @Test
     public void templateRepresentation() {
         TestDTO testDTO = new TestDTO("1", "foo", "bar", "baz");
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
         CollectionJson.Template template = new CollectionJson.Template();
         template.addData("id", testDTO.id, "Id")
                 .addData("foo", testDTO.foo, "The foo")
@@ -149,7 +149,7 @@ public class CollectionJsonTest {
 
     @Test
     public void  errorRepresentation() {
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
 
         CollectionJson.Error error = new CollectionJson.Error(
                 "Server Error", "X1C2", "The server have encountered an error, please wait and try again.");
@@ -171,7 +171,7 @@ public class CollectionJsonTest {
         TestDTO dto3 = new TestDTO("3", "Abby lane", "binke bane", "ole dole doff!");
 
 
-        CollectionJson collectionJson = CollectionJson.newCollection("1.0", "http://example.org/friends/");
+        CollectionJson collectionJson = CollectionJson.newCollection("http://example.org/friends/");
 
         collectionJson.collection()
                 .addLink("feed", "http://example.org/friends/rss")
