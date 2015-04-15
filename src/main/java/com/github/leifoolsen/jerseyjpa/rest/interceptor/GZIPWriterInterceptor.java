@@ -20,6 +20,10 @@ import java.util.zip.GZIPOutputStream;
  */
 
 @Provider  // => Automatically discovered by the JAX-RS runtime during a provider scanning phase.
+
+// interceptor will be executed only when resource methods
+// annotated with @Compress annotation will be executed
+@Compress
 public class GZIPWriterInterceptor implements WriterInterceptor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
