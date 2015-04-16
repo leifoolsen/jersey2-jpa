@@ -22,6 +22,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -38,7 +39,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class BookResourceTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -81,6 +81,7 @@ public class BookResourceTest {
                 .path(BookResource.RESOURCE_PATH)
                 .path(ISBN_TRAVELING_TO_INFINITY)
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -241,6 +242,7 @@ public class BookResourceTest {
         final Response response = target
                 .path(BookResource.RESOURCE_PATH)
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -429,6 +431,7 @@ public class BookResourceTest {
                 .queryParam("offset", 5)
                 .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -447,6 +450,7 @@ public class BookResourceTest {
                 .queryParam("offset", 5)
                 .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -467,6 +471,7 @@ public class BookResourceTest {
                 .queryParam("offset", 0)
                 .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -484,6 +489,7 @@ public class BookResourceTest {
                 .path("search/publisher.name")
                 .queryParam("q", "gyldendal")
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -501,6 +507,7 @@ public class BookResourceTest {
                 .path("search/author")
                 .queryParam("q", "Loe")
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -518,6 +525,7 @@ public class BookResourceTest {
                 .path("search/any")
                 .queryParam("q", "hawking")
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -554,6 +562,7 @@ public class BookResourceTest {
                 .queryParam("offset", 0)
                 .queryParam("limit", 5)
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -579,7 +588,9 @@ public class BookResourceTest {
             for (String key: map.keySet()) {
                 t = t.queryParam(key, map.get(key));
             }
-            response = t.request(MediaType.APPLICATION_JSON_TYPE).get();
+            response = t.request(MediaType.APPLICATION_JSON_TYPE)
+                    .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
+                    .get();
 
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
             collectionJson = response.readEntity(CollectionJson.class);
@@ -594,6 +605,7 @@ public class BookResourceTest {
                 .path("count")
                 .request(MediaType.TEXT_PLAIN)
                 .accept(MediaType.TEXT_PLAIN_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -616,7 +628,9 @@ public class BookResourceTest {
             for (String key: map.keySet()) {
                 t = t.queryParam(key, map.get(key));
             }
-            response = t.request(MediaType.APPLICATION_JSON_TYPE).get();
+            response = t.request(MediaType.APPLICATION_JSON_TYPE)
+                    .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
+                    .get();
 
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
             collectionJson = response.readEntity(CollectionJson.class);
@@ -634,12 +648,14 @@ public class BookResourceTest {
                 .path("search/any")
                 .queryParam("q", "hawking")
                 .request(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .get();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
         List<Object> objects = response.getHeaders().get("Content-Encoding");
-        assertTrue(objects != null && objects.contains("gzip"));
+        assertNotNull(objects);
+        assertThat(objects.toString(), containsString("gzip"));
 
         objects = response.getHeaders().get("Content-Type");
         assertNotNull(objects);

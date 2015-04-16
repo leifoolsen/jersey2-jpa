@@ -41,7 +41,7 @@ public class SearchResource {
     }
 
     @GET
-    @Compress
+    @Compress  // Client send request with "Accept-Encoding: gzip" - so annotation is not required
     public Response allBooks(
             @SearchType @PathParam("searchType") final String searchType,
             @QueryParam("q") final String searchValue,

@@ -48,9 +48,12 @@ public class BookResource {
     private UriInfo uriInfo; // actual uri info provided by parent resource (threadsafe)
     private ResourceContext resourceContext;
 
-    public BookResource(@Context @NotNull UriInfo uriInfo, @Context @NotNull ResourceContext resourceContext) {
+    public BookResource(
+            @Context @NotNull UriInfo uriInfo,
+            @Context @NotNull ResourceContext resourceContext) {
         this.uriInfo = uriInfo;
         this.resourceContext = resourceContext;
+
         logger.debug(this.getClass().getSimpleName() + " created");
     }
 

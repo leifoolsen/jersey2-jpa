@@ -1,14 +1,17 @@
 package com.github.leifoolsen.jerseyjpa.rest.interceptor;
 
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -25,13 +28,19 @@ public class GZIPReaderInterceptor implements ReaderInterceptor {
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
 
         MultivaluedMap<String,String> headers = context.getHeaders();
-        List<String> contentEncoding = headers.get("Content-Encoding");
 
-        if(contentEncoding!= null && contentEncoding.contains("gzip")) {
-            logger.debug("Decompressing GZIP");
+        List<String> contentEncoding = MoreObjects.firstNonNull(
+                headers.get(HttpHeaders.CONTENT_ENCODING), new ArrayList<String>());
 
-            final InputStream originalInputStream = context.getInputStream();
-            context.setInputStream(new GZIPInputStream(originalInputStream));
+        for (String s : contentEncoding) {
+            if(s.contains("gzip")) {
+                logger.debug("Decompressing GZIP");
+
+                final InputStream originalInputStream = context.getInputStream();
+                context.setInputStream(new GZIPInputStream(originalInputStream));
+
+                break;
+            }
         }
         return context.proceed();
     }
