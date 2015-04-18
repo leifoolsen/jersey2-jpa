@@ -11,7 +11,7 @@ public class QueryParameter {
         queryParameters.put(name, value);
     }
 
-    public static QueryParameter with(String name, Object value) {
+    public static QueryParameter with( String name, Object value) {
         return new QueryParameter(name, value);
     }
 
