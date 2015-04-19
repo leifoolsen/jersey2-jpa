@@ -21,10 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
@@ -72,7 +69,7 @@ public class Book {
         this.isbn = builder.isbn;
         this.title = builder.title;
         this.author = builder.author;
-        this.published = Date.from(builder.published.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        this.published = DateAdapter.localDateToDate(builder.published);
         this.translator = builder.translator;
         this.summary = builder.summary;
         this.publisher = builder.publisher;
@@ -83,13 +80,10 @@ public class Book {
     public String getISBN() { return isbn; }
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
+    public LocalDate getPublished() { return DateAdapter.dateTocalDate(published); } //return LocalDateTime.ofInstant(published.toInstant(), ZoneId.systemDefault()).toLocalDate(); // error!
     public String getTranslator() { return translator; }
     public String getSummary() { return summary; }
     public Publisher getPublisher() { return publisher; }
-    public LocalDate getPublished() {
-        //return LocalDateTime.ofInstant(published.toInstant(), ZoneId.systemDefault()).toLocalDate(); // error!
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(published.getTime()), ZoneId.systemDefault()).toLocalDate();
-    }
 
     /**
      * <p>An ISBN number is divided into the following number segments:</p>
