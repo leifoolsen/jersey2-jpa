@@ -21,7 +21,7 @@ public class DateAdapter extends XmlAdapter<String, Date> {
 
     public DateAdapter(final String v) { this.date = stringToDate(v); }
 
-    public DateAdapter(final Date v) { this.date = v; }
+    public DateAdapter(final Date v) { this.date = new Date(v.getTime()); }
 
     public DateAdapter(final LocalDate v) {
         this.date = localDateToDate(v);
@@ -35,7 +35,7 @@ public class DateAdapter extends XmlAdapter<String, Date> {
     @Override
     public String marshal(final Date v) { return dateToString(v); }
 
-    public Date getDate(){ return date; }
+    public Date getDate(){ return new Date(date.getTime()); }
 
     public LocalDate getLocalDate(){ return dateTocalDate(date); }
 

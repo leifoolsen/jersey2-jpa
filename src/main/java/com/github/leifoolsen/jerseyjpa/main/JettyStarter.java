@@ -20,8 +20,8 @@ public class JettyStarter {
         JettyFactory.start(server);
 
         URI applicationURI = UriBuilder.fromUri(server.getURI()).path(JerseyJpaApp.APPLICATION_PATH).build();
-        System.out.println(String.format("\nServer started with WADL available at "
-                + "%s/application.wadl\nExample usage: %s/books\n\nHIT ENTER TO STOP SERVER ...",
+        System.out.println(String.format("%nServer started with WADL available at "
+                + "%s/application.wadl%nExample usage: %s/books%n%nHIT ENTER TO STOP SERVER ...",
                 applicationURI.toString(), applicationURI.toString()));
 
         try {

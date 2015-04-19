@@ -21,7 +21,7 @@ public class DateTimeAdapter extends XmlAdapter<String, Date> {
 
     public DateTimeAdapter(final String v) { this.date = stringToDate(v); }
 
-    public DateTimeAdapter(final Date v) { this.date = v; }
+    public DateTimeAdapter(final Date v) { this.date = new Date(v.getTime()); }
 
     public DateTimeAdapter(final LocalDateTime v) {
         this.date = v != null ? Date.from(v.atZone(ZoneId.systemDefault()).toInstant()) : null;
@@ -37,7 +37,7 @@ public class DateTimeAdapter extends XmlAdapter<String, Date> {
         return dateToString(v);
     }
 
-    public Date getDate(){ return date; }
+    public Date getDate(){ return new Date(date.getTime()); }
 
 
     public static String dateToString(final Date v) {

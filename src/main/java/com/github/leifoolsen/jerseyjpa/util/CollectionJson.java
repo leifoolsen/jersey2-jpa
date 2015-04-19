@@ -144,7 +144,6 @@ public class CollectionJson {
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Collection {
-        private final String version = COLLECTION_JSON_VERSION;
         private String       href;
         private List<Link>   links   = new ArrayList<>();
         private List<Item>   items   = new ArrayList<>();
@@ -188,7 +187,7 @@ public class CollectionJson {
             return this;
         }
         public String version() {
-            return version;
+            return COLLECTION_JSON_VERSION;
         }
         public String href() {
             return href;

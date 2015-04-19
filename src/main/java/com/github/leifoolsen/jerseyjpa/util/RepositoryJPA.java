@@ -466,8 +466,8 @@ public class RepositoryJPA implements Repository {
             else if(m.size() < 1) {
                 throw new IllegalStateException("Entity without @Id annotation is not supported by this repository.");
             }
-            member = m.get(0);
-            entityIdCache.putIfAbsent(entityClass.getName(), member);
+            entityIdCache.putIfAbsent(entityClass.getName(), m.get(0));
+            return entityIdCache.get(entityClass.getName());
         }
         return member;
     }
@@ -519,7 +519,7 @@ public class RepositoryJPA implements Repository {
         final boolean accessible = method.isAccessible();
         try {
             method.setAccessible(true);
-            return method.invoke(target, (Object[])null);
+            return method.invoke(target, (Object[]) null);
         }
         catch (final Exception e) {
             throw new IllegalArgumentException(
@@ -535,7 +535,10 @@ public class RepositoryJPA implements Repository {
     }
 
     public static String methodToString(final Method method) {
-        return method.getDeclaringClass().getName() + '.' + method.getName() + "(" +
-                method.getParameterTypes().toString() + ")";
+        String s = "";
+        for (Class<?> c : method.getParameterTypes()) {
+            s += s.isEmpty() ? c.toString() : ", " + c.toString();
+        }
+        return method.getDeclaringClass().getName() + '.' + method.getName() + "(" + s + ")";
     }
 }
