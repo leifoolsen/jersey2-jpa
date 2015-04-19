@@ -83,10 +83,13 @@ public class Book {
     public String getISBN() { return isbn; }
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
-    public Date getPublished() { return published; }
     public String getTranslator() { return translator; }
     public String getSummary() { return summary; }
     public Publisher getPublisher() { return publisher; }
+    public LocalDate getPublished() {
+        //return LocalDateTime.ofInstant(published.toInstant(), ZoneId.systemDefault()).toLocalDate(); // error!
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(published.getTime()), ZoneId.systemDefault()).toLocalDate();
+    }
 
     /**
      * <p>An ISBN number is divided into the following number segments:</p>
@@ -155,7 +158,7 @@ public class Book {
         Builder b = new Builder(source.isbn)
                 .title(source.title)
                 .author(source.author)
-                .published(LocalDateTime.ofInstant(Instant.ofEpochMilli(source.published.getTime()), ZoneId.systemDefault()).toLocalDate())
+                .published(source.getPublished())
                 .summary(source.summary)
                 .publisher(source.publisher);
 

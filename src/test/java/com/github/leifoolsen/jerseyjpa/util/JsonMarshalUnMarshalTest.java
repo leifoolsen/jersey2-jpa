@@ -27,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -70,7 +69,7 @@ public class JsonMarshalUnMarshalTest {
         String isbn = bookAsJsonObject.getString("isbn");
         assertThat(isbn, equalTo(book.getISBN()));
 
-        assertThat(new GregorianCalendar(2013, 0, 1).getTime(), equalTo(book.getPublished()));
+        assertThat(LocalDate.of(2013, Month.JANUARY, 1), equalTo(book.getPublished()));
     }
 
     @Test
@@ -148,7 +147,7 @@ public class JsonMarshalUnMarshalTest {
         String isbn = bookAsJsonObject.getString("isbn");
         assertThat(isbn, equalTo(book.getISBN()));
 
-        assertThat(new GregorianCalendar(2013, 0, 1).getTime(), equalTo(book.getPublished()));
+        assertThat(LocalDate.of(2013, Month.JANUARY, 1), equalTo(book.getPublished()));
     }
 
     private static Book createBook() {

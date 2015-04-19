@@ -4,7 +4,7 @@ import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.util.DateAdapter;
 
 import javax.ws.rs.FormParam;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class BookDTO {
     @FormParam("id")
@@ -54,7 +54,7 @@ public class BookDTO {
     public BookDTO title(final String title) { this.title = title; return this; }
     public BookDTO author(final String author) { this.author = author; return this; }
     public BookDTO published(final String published) { this.published = new DateAdapter(published); return this; }
-    public BookDTO published(final Date published) { this.published = new DateAdapter(published); return this; }
+    public BookDTO published(final LocalDate published) { this.published = new DateAdapter(published); return this; }
     public BookDTO translator(final String translator) { this.translator = translator; return this; }
     public BookDTO summary(final String summary) { this.summary = summary; return this; }
     public BookDTO publisherCode(final String publisherCode) { this.publisherCode = publisherCode; return this; }
