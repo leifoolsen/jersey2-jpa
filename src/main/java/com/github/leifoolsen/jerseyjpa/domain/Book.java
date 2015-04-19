@@ -1,7 +1,7 @@
 package com.github.leifoolsen.jerseyjpa.domain;
 
 import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
-import com.github.leifoolsen.jerseyjpa.util.DateTimeAdapter;
+import com.github.leifoolsen.jerseyjpa.util.DateAdapter;
 import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -50,9 +50,9 @@ public class Book {
     @NotBlank
     private String author;
 
-    @XmlJavaTypeAdapter(DateTimeAdapter.class)
+    @XmlJavaTypeAdapter(DateAdapter.class)
     @Temporal(TemporalType.DATE)
-    private Date published;
+    private Date published; // Can not use JSR-310. Must wait for JPA-2.2
 
     private String translator;
 
