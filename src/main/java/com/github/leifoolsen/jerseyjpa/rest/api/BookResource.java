@@ -33,6 +33,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Singleton
 @Path(BookResource.RESOURCE_PATH)
@@ -72,7 +77,7 @@ public class BookResource {
                 .with(params.isbn)
                 .title(params.title)
                 .author(params.author)
-                .published(params.published != null ? params.published.getDate() : null)
+                .published(params.published != null ? dateToLocalDate(params.published.getDate()) : null)
                 .translator(params.translator)
                 .summary(params.summary)
                 .publisher(publisher)
@@ -103,7 +108,7 @@ public class BookResource {
                 .with(params.isbn)
                 .title(params.title)
                 .author(params.author)
-                .published(params.published != null ? params.published.getDate() : null)
+                .published(params.published != null ? dateToLocalDate(params.published.getDate()) : null)
                 .translator(params.translator)
                 .summary(params.summary)
                 .publisher(publisher)
@@ -117,6 +122,13 @@ public class BookResource {
                 .ok(collectionJson)
                 .location(uriInfo.getAbsolutePathBuilder().clone().path(params.isbn).build())
                 .build();
+    }
+
+    @Deprecated  // TODO: remove when moving to JSR310 is completed
+    private static LocalDate dateToLocalDate(final Date d) {
+        return d != null
+                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(d.getTime()), ZoneId.systemDefault()).toLocalDate()
+                : null;
     }
 
     @DELETE

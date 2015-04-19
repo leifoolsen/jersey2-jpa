@@ -15,8 +15,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
@@ -82,7 +83,7 @@ public class BookRepositoryJpaTest {
             .publisher(publisher)
             .title("Kurtby")
             .author("Loe, Erlend")
-            .published(new GregorianCalendar(2008, 1, 1).getTime())
+            .published(LocalDate.of(2008, Month.FEBRUARY, 1))
             .summary("Kurt og gjengen er på vei til Mummidalen da Kurt sovner ved rattet og trucken havner " +
                     "i en svensk elv. Et langt stykke nedover elva ligger Kurtby - et lite samfunn hvor en " +
                     "dame som heter Kirsti Brud styrer og steller i samråd med Den hellige ånd. Det går " +
@@ -145,7 +146,7 @@ public class BookRepositoryJpaTest {
             .title("Accidence Will Happen : The Non-Pedantic Guide to English Usage")
             .author("Kamm, Oliver")
             .publisher(publisher)
-            .published(new GregorianCalendar(2015, 2, 12).getTime())
+            .published(LocalDate.of(2015, Month.MARCH, 12))
             .summary("Are standards of English alright - or should that be all right? To knowingly " +
                     "split an infinitive or not to? And what about ending a sentence with preposition, or for " +
                     "that matter beginning one with 'and'? We learn language by instinct, but good English, " +
@@ -164,7 +165,7 @@ public class BookRepositoryJpaTest {
 
         Book changedBook = Book
                 .with(bookForUpdate, true)
-                .published(new GregorianCalendar(2014, 12, 15).getTime())
+                .published(LocalDate.of(2014, Month.DECEMBER, 15))
                 .build();
 
         b = bookRepository.createOrUpdateBook(changedBook);

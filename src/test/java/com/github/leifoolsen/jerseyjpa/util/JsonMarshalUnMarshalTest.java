@@ -24,6 +24,8 @@ import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -156,7 +158,7 @@ public class JsonMarshalUnMarshalTest {
                 .title("Guide to Middle Earth: Tolkien and The Lord of the Rings")
                 .author("Duriez, Colin")
                 .publisher(publisher)
-                .published(new GregorianCalendar(2013, 0, 1).getTime())
+                .published(LocalDate.of(2013, Month.JANUARY, 1))
                 .summary("An illuminating guide to Middle-earth and the man who created it.")
                 .build();
     }

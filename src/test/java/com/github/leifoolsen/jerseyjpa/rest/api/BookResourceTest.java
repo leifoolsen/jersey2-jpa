@@ -26,7 +26,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Map;
 
@@ -149,7 +150,7 @@ public class BookResourceTest {
                 .publisher(publisher)
                 .title("Kurtby")
                 .author("Loe, Erlend")
-                .published(new GregorianCalendar(2008, 1, 1).getTime())
+                .published(LocalDate.of(2008, Month.JANUARY, 1))
                 .summary("Kurt og gjengen er på vei til Mummidalen da Kurt sovner ved rattet og trucken havner " +
                         "i en svensk elv. Et langt stykke nedover elva ligger Kurtby - et lite samfunn hvor en " +
                         "dame som heter Kirsti Brud styrer og steller i samråd med Den hellige ånd. Det går " +
@@ -209,7 +210,7 @@ public class BookResourceTest {
                 .title("The Guest Cat: DUPLICATE")
                 .author("Hiraide, Takashi")
                 .publisher(DomainPopulator.getPublishers().get(DomainPopulator.PICADOR))
-                .published(new GregorianCalendar(2014, 8, 25).getTime())
+                .published(LocalDate.of(2014, Month.SEPTEMBER, 25))
                 .translator("Selland, Eric")
                 .summary("....")
                 .build();
@@ -282,7 +283,7 @@ public class BookResourceTest {
                 .publisher(nonExistingPublisher)
                 .title("A title")
                 .author("Loe, Erlend")
-                .published(new GregorianCalendar(2008, 0, 1).getTime())
+                .published(LocalDate.of(2008, Month.JANUARY, 1))
                 .summary("Lorem ipsum etc")
                 .build();
 

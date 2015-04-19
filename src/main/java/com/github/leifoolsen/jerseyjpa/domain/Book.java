@@ -21,6 +21,10 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
@@ -68,7 +72,7 @@ public class Book {
         this.isbn = builder.isbn;
         this.title = builder.title;
         this.author = builder.author;
-        this.published = builder.published;
+        this.published = Date.from(builder.published.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         this.translator = builder.translator;
         this.summary = builder.summary;
         this.publisher = builder.publisher;
@@ -151,7 +155,7 @@ public class Book {
         Builder b = new Builder(source.isbn)
                 .title(source.title)
                 .author(source.author)
-                .published(source.published)
+                .published(LocalDateTime.ofInstant(Instant.ofEpochMilli(source.published.getTime()), ZoneId.systemDefault()).toLocalDate())
                 .summary(source.summary)
                 .publisher(source.publisher);
 
@@ -167,7 +171,7 @@ public class Book {
         private String isbn;
         private String title;
         private String author;
-        private Date   published;
+        private LocalDate published;
         private String translator;
         private String summary;
         private Publisher publisher;
@@ -196,7 +200,7 @@ public class Book {
             this.author = author;
             return this;
         }
-        public Builder published(final Date published) {
+        public Builder published(final LocalDate published) {
             this.published = published;
             return this;
         }
