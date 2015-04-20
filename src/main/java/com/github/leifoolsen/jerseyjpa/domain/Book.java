@@ -2,6 +2,7 @@ package com.github.leifoolsen.jerseyjpa.domain;
 
 import com.github.leifoolsen.jerseyjpa.constraint.Isbn;
 import com.github.leifoolsen.jerseyjpa.util.DateAdapter;
+import com.github.leifoolsen.jerseyjpa.util.DateLocalDateUtil;
 import com.github.leifoolsen.jerseyjpa.util.StringUtil;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -69,7 +70,7 @@ public class Book {
         this.isbn = builder.isbn;
         this.title = builder.title;
         this.author = builder.author;
-        this.published = DateAdapter.localDateToDate(builder.published);
+        this.published = DateLocalDateUtil.toDate(builder.published);
         this.translator = builder.translator;
         this.summary = builder.summary;
         this.publisher = builder.publisher;
@@ -80,7 +81,7 @@ public class Book {
     public String getISBN() { return isbn; }
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
-    public LocalDate getPublished() { return DateAdapter.dateTocalDate(published); } //return LocalDateTime.ofInstant(published.toInstant(), ZoneId.systemDefault()).toLocalDate(); // error!
+    public LocalDate getPublished() { return DateLocalDateUtil.dateToLocalDate(published); }
     public String getTranslator() { return translator; }
     public String getSummary() { return summary; }
     public Publisher getPublisher() { return publisher; }

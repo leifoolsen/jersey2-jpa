@@ -4,7 +4,7 @@ import com.github.leifoolsen.jerseyjpa.constraint.SearchType;
 import com.github.leifoolsen.jerseyjpa.domain.Book;
 import com.github.leifoolsen.jerseyjpa.domain.Publisher;
 import com.github.leifoolsen.jerseyjpa.util.CollectionJson;
-import com.github.leifoolsen.jerseyjpa.util.DateAdapter;
+import com.github.leifoolsen.jerseyjpa.util.DateLocalDateUtil;
 import com.google.common.base.Preconditions;
 
 import javax.ws.rs.Path;
@@ -70,7 +70,7 @@ public class CollectionJsonResourceHelper {
                 .addData("isbn", book.getISBN(), "ISBN")
                 .addData("title", book.getTitle(), "Title")
                 .addData("author", book.getAuthor(), "Author")
-                .addData("published", DateAdapter.dateToString(book.getPublished()), "Published")
+                .addData("published", DateLocalDateUtil.dateToString(book.getPublished()), "Published")
                 .addData("summary", book.getSummary(), "Summary")
                 .addData("publisher.code", book.getPublisher().getCode(), "Publisher code");
 
