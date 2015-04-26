@@ -39,8 +39,8 @@
         <slf4j.version>1.7.9</slf4j.version>
         <typesafe.config.version>1.2.1</typesafe.config.version>
 
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.debug>true</maven.compiler.debug>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
@@ -105,11 +105,6 @@
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>findbugs</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.threeten</groupId>
-            <artifactId>threetenbp</artifactId>
         </dependency>
 
         <!-- Hibernate JPA. Under normal circumstances you shouldn't mix this with EL-JPA -->
@@ -379,14 +374,6 @@
                 <artifactId>findbugs</artifactId>
                 <version>${findbugs.version}</version>
             </dependency>
-
-            <!-- JSR-310, Java8 Date/Time backport for jdk7 -->
-            <dependency>
-                <groupId>org.threeten</groupId>
-                <artifactId>threetenbp</artifactId>
-                <version>${jsr310.backport.version}</version>
-            </dependency>
-
 
             <!-- Hibernate JPA -->
             <dependency>
